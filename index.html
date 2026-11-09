@@ -1,0 +1,1453 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+</head>
+<body>
+<title>马克杯刻度 · 学习动力</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+:root{
+  --bg:#fcf2e3;--paper:#fffaf2;--paper-2:#f9eedd;--ink:#33251c;--ink-2:#594536;--muted:#77634f;
+  --line:rgba(90,62,42,.16);--crema:#8b4565;--espresso:#3f2a20;--latte:#e2bb78;--matcha:#6e9b7c;
+  --soft-crema:#f4e2e8;--soft-matcha:#e3efe3;--leaf:#3f6b4c;--radius:22px;color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.wrap{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 40px}
+header.top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-block:8px 18px}
+.brand{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--espresso);letter-spacing:.04em}
+.brand svg{width:30px;height:32px}
+.original-mark{font-size:11px;font-weight:600;color:var(--crema);border:1px solid var(--crema);border-radius:999px;padding:1px 8px;letter-spacing:.06em}
+.ghost{background:transparent;border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:13px;color:var(--ink-2)}
+.screen{display:none}.screen.active{display:block;animation:fade .35s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:24px;box-shadow:0 10px 30px -18px rgba(91,58,34,.35)}
+
+/* 封面 */
+.cover{text-align:center;padding-block:8px 6px}
+.cover-mug svg{width:150px;height:160px;display:block;margin:0 auto 10px;animation:float 3s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-8px)}}
+@media (prefers-reduced-motion: reduce){.cover-mug svg{animation:none}}
+.cover-art{display:flex;justify-content:center;margin:4px 0 18px}
+.cover-art img{width:min(23vw,108px);aspect-ratio:1;border-radius:22px;border:3px solid var(--paper);box-shadow:0 8px 20px -12px rgba(63,42,32,.45);margin:0 -7px;background:var(--paper-2)}
+.cover-art img:nth-child(odd){transform:rotate(-5deg)}.cover-art img:nth-child(even){transform:rotate(4deg) translateY(6px)}
+h1{font-size:clamp(30px,7.6vw,42px);line-height:1.25;margin:0 0 14px;text-wrap:balance;letter-spacing:.02em;color:var(--espresso)}
+h1 span{background:linear-gradient(transparent 58%,var(--latte) 58% 92%,transparent 92%);padding:0 2px}
+.pills{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:0 0 22px}
+.pills span{background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:13px;color:var(--ink-2)}
+.access-card{max-width:400px;margin:0 auto}
+.access-row{display:flex;gap:8px;background:var(--paper);border:1.5px solid var(--line);border-radius:999px;padding:6px}
+.access-row input{flex:1;min-width:0;border:0;background:transparent;padding:8px 14px;font-size:17px;text-align:center;letter-spacing:.2em}
+.access-row input::placeholder{letter-spacing:.05em;font-size:15px;color:var(--muted)}
+.access-row input:focus{outline:none}
+.access-row:focus-within{border-color:var(--crema)}
+.access-row .btn{border-radius:999px;padding:10px 22px}
+.cover-fine{font-size:13px;color:var(--muted);margin:4px auto 0;max-width:24em}
+.btn{border:0;border-radius:16px;background:var(--espresso);color:var(--paper);padding:12px 22px;font-weight:700;letter-spacing:.06em}
+.btn.alt{background:var(--crema)}
+.btn.line{background:transparent;color:var(--espresso);border:1.5px solid var(--espresso)}
+.err{color:var(--crema);font-size:13px;min-height:1.6em;margin-top:6px}
+.shake{animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-6px)}50%{transform:translateX(6px)}75%{transform:translateX(-3px)}}
+
+/* 答题 */
+.progress-box{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:8px 12px;display:flex;align-items:center;gap:12px}
+.progress-box svg{width:44px;height:48px;flex:none}
+.progress-main{flex:1;min-width:0}
+.progress-meta{display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}
+.progress-track{height:8px;border-radius:99px;background:var(--paper-2);border:1px solid var(--line);overflow:hidden}
+.progress-fill{height:100%;background:var(--latte);border-radius:99px;transition:width .3s}
+.mug-liquid{transition:transform .4s ease}
+.question-card{margin-top:8px}
+.q-num{font-size:13px;color:var(--crema);font-weight:700;letter-spacing:.1em}
+.q-text{font-size:21px;font-weight:700;line-height:1.55;margin:6px 0 20px;text-wrap:pretty}
+.options{display:grid;gap:10px}
+.option{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--paper-2);border:1.5px solid transparent;border-radius:16px;padding:12px 14px;transition:border-color .15s,background .15s}
+.option:hover{border-color:var(--latte)}
+.option.on{background:var(--soft-crema);border-color:var(--crema)}
+.option .dot{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:700;background:var(--paper);border:1px solid var(--line);color:var(--espresso)}
+.option.on .dot{background:var(--crema);color:var(--paper);border-color:var(--crema)}
+.skip{margin-top:12px;background:none;border:1px dashed var(--line);border-radius:14px;padding:8px 14px;font-size:13px;color:var(--muted);width:100%}
+.skip.on{border-color:var(--crema);color:var(--crema)}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:16px;font-size:13px;color:var(--muted)}
+.nav .btn{min-width:8em}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+
+/* 加载 */
+#loading{position:fixed;inset:0;background:rgba(252,242,227,.95);display:grid;place-items:center;z-index:20;text-align:center}
+#loading svg{width:110px;height:120px;animation:bob 1s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-8px) rotate(-3deg)}}
+
+/* 结果 */
+.safety{background:var(--soft-matcha);border:1px solid var(--matcha);border-radius:20px;padding:16px 18px;font-size:15px;margin-bottom:16px}
+.safety b{display:block;color:var(--leaf);margin-bottom:4px}
+.hero{text-align:center;padding:28px 22px}
+.hero .eyebrow{font-size:13px;color:var(--muted);letter-spacing:.12em}
+.hero .pre{font-size:clamp(17px,4.6vw,22px);font-weight:700;color:var(--crema);margin-top:8px;text-wrap:balance}
+.hero .tname{font-size:clamp(34px,9vw,48px);font-weight:800;color:var(--espresso);line-height:1.2;margin:6px 0}
+.hero.soft .tname{font-size:28px}
+.hero .roast{font-size:17px;color:var(--ink-2);max-width:26em;margin:0 auto}
+.combo{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:16px}
+.chip{border-radius:999px;padding:4px 12px;font-size:13px;border:1px solid var(--line);background:var(--paper-2)}
+.chip i{font-style:normal;color:var(--muted);margin-right:4px}
+.panel{margin-top:16px}
+.panel h3{margin:0 0 2px;font-size:13px;color:var(--crema);letter-spacing:.12em}
+.panel .pname{font-size:24px;font-weight:800;color:var(--espresso);margin:0 0 4px}
+.panel .proast{color:var(--ink-2);margin:0 0 12px}
+.panel h4{font-size:15px;margin:16px 0 6px;color:var(--espresso)}
+.panel p{margin:0 0 8px}
+.quote .qq{display:block;font-size:13px;color:var(--muted)}
+.quote{border-left:3px solid var(--latte);padding:4px 12px;margin:6px 0;color:var(--ink-2);font-size:15px;background:var(--paper-2);border-radius:0 12px 12px 0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.box{border-radius:16px;padding:12px 14px;font-size:15px;min-width:0}
+.box.plus{background:var(--soft-matcha)}.box.minus{background:var(--soft-crema)}
+.box b{display:block;font-size:13px;letter-spacing:.08em;margin-bottom:4px}
+.box ul{margin:0;padding-left:1.1em}
+.deep{display:grid;gap:12px;margin-top:16px;padding-top:14px;border-top:1px dashed var(--line)}
+.drow b{display:block;font-size:13px;color:var(--crema);letter-spacing:.08em;margin-bottom:2px}
+.drow p{margin:0}
+.drow ul,.drow ol{margin:0;padding-left:1.2em}
+.drow li{margin:2px 0}
+.drow.brain{background:var(--paper-2);border-radius:16px;padding:12px 14px}
+.deepwrap{margin-top:16px;border-top:1px dashed var(--line);padding-top:12px}
+.deepwrap>summary{font-size:15px;color:var(--crema)}
+.aw{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+.tension{background:var(--paper-2);border-radius:16px;padding:12px 14px;margin:8px 0}
+.tension p{margin:0 0 4px;font-size:15px}.tension .tt{font-weight:800;color:var(--espresso);font-size:17px}
+.proof{font-size:13px;color:var(--muted)}
+.proof span{display:block;margin-top:2px}
+.mix{display:flex;height:30px;border-radius:99px;overflow:hidden;margin:8px 0 6px}
+.mix span{display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--paper);min-width:0}
+.m1{background:var(--matcha)}.m2{background:var(--crema)}.m3{background:var(--latte)}
+.mixkey{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--ink-2);margin-bottom:8px}
+.mixkey i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+.scene{border-left:3px solid var(--latte);padding:2px 0 2px 12px;margin:10px 0}
+.scene b{font-size:13px;color:var(--crema);letter-spacing:.06em}.scene p{margin:2px 0 0}.scene ul,.scene ol{margin:2px 0 0;padding-left:1.2em}.scene li{margin:3px 0}
+.tips{padding-left:1.2em;margin:4px 0 0}.tips li{margin:6px 0}
+.lead{font-size:17px;font-weight:600;color:var(--espresso);margin:6px 0 10px}
+.roasts{display:grid;gap:4px;font-size:14px;color:var(--ink-2);margin-bottom:6px}
+.full .drow.brain{margin-top:16px}.full .drow.brain p{margin:0 0 6px}
+.try ul{margin:0;padding-left:1.1em}
+.more{margin-top:16px}.more>summary{font-size:15px;color:var(--muted)}
+.decl{background:var(--paper-2);border:1.5px dashed var(--latte);border-radius:16px;padding:14px 16px;margin-top:8px}
+.decl p{margin:0 0 8px}.decl .sign{margin:12px 0 0;text-align:right;color:var(--ink-2)}
+.fact{background:var(--paper-2);border-radius:16px;padding:12px 14px;font-size:15px}
+.fact b{color:var(--crema)}
+.try{border:1.5px dashed var(--crema);border-radius:16px;padding:12px 14px}
+.dash-group{margin-top:12px}
+.dash-group > b{font-size:13px;color:var(--muted);letter-spacing:.08em}
+.bar{display:grid;grid-template-columns:7.5em 1fr 2.4em;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.bar .t{height:10px;border-radius:99px;background:var(--paper-2);overflow:hidden}
+.bar .t i{display:block;height:100%;border-radius:99px;background:var(--latte)}
+.bar.hi .t i{background:var(--crema)}
+.bar span:last-child{color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+textarea{width:100%;min-height:80px;border:1.5px solid var(--line);border-radius:14px;background:var(--paper-2);padding:10px 12px;resize:vertical}
+textarea:focus{outline:none;border-color:var(--latte)}
+.ex-step{font-size:15px;font-weight:600;margin:12px 0 6px}
+details{margin-top:16px}
+summary{cursor:pointer;font-weight:700;color:var(--espresso)}
+.note{font-size:12px;color:var(--muted);margin-top:14px}
+
+
+/* 结果页：要点先行 */
+.motive{text-align:left;padding:24px 22px}
+.motive .eyebrow{text-align:left}
+.mlabel{font-size:15px;color:var(--ink-2);margin-top:8px}
+.mtitle{font-size:clamp(22px,5.6vw,28px);font-weight:800;color:var(--espresso);line-height:1.4;margin:2px 0 14px;text-wrap:balance}
+.drv{display:grid;gap:8px;margin:4px 0 10px}
+.dv{display:grid;grid-template-columns:minmax(0,9em) 1fr 2.4em;gap:10px;align-items:center;font-size:15px;color:var(--ink-2)}
+.dv .t{height:12px;border-radius:99px;background:var(--paper-2);overflow:hidden}
+.dv .t i{display:block;height:100%;border-radius:99px;background:var(--latte)}
+.dv b{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+.dv.top{color:var(--espresso);font-weight:700}.dv.top .t i{background:var(--crema)}.dv.top b{color:var(--crema)}
+.dv.off{opacity:.45}
+.drivers{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.drivers div{background:var(--paper-2);border-radius:14px;padding:10px 12px;min-width:0}
+.drivers span{display:block;font-size:12px;color:var(--muted)}
+.drivers b{font-size:16px;color:var(--espresso)}
+.persona{margin-top:14px}
+.cheer{font-size:16px;color:var(--leaf);background:var(--soft-matcha);border-radius:14px;padding:10px 14px;margin:12px auto 0;max-width:30em;line-height:1.7}
+.cheer-card{margin-top:14px;text-align:center;padding:26px 22px;background:var(--soft-matcha);border-color:transparent}
+.cheer-card svg{width:28px;height:28px;stroke:var(--leaf)}
+.cheer-card h3{margin:6px 0 8px;font-size:15px;color:var(--leaf)}
+.cheer-card .big{font-size:20px;font-weight:800;color:var(--espresso);line-height:1.5;margin:0 0 8px;text-wrap:balance}
+.cheer-card p{margin:0;color:var(--ink-2)}
+.sec{margin-top:14px;padding:20px 22px;scroll-margin-top:calc(env(safe-area-inset-top,0px) + 64px)}
+.sec-h{display:flex;align-items:center;gap:10px}
+.sec-h h3{margin:0;font-size:17px;color:var(--espresso);letter-spacing:.02em}
+.ic{width:34px;height:34px;border-radius:12px;background:var(--soft-crema);display:grid;place-items:center;flex:none}
+.ic svg{width:18px;height:18px;stroke:var(--crema)}
+.take{font-size:17px;font-weight:700;color:var(--ink);margin:12px 0 4px;line-height:1.6}
+.small{font-size:14px;color:var(--ink-2)}
+.sec h4{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--ink-2);margin:18px 0 8px}
+.sec h4 svg{width:16px;height:16px;stroke:var(--crema)}
+.jump{position:sticky;top:env(safe-area-inset-top,0px);z-index:6;display:flex;gap:6px;overflow-x:auto;padding-block:10px;margin-top:10px;background:var(--bg);scrollbar-width:none}
+.jump::-webkit-scrollbar{display:none}
+.jump button{flex:none;border:1px solid var(--line);background:var(--paper);color:var(--ink-2);border-radius:999px;padding:6px 14px;font-size:14px}
+.jump button:hover,.jump button:focus-visible{border-color:var(--crema);color:var(--crema);outline:none}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.row{display:flex;gap:10px;border-radius:16px;padding:12px 14px;min-width:0}
+.row svg{width:20px;height:20px;flex:none;margin-top:2px}
+.row b{font-size:13px}.row p{margin:2px 0 0;font-size:15px}
+.row.good{background:var(--soft-matcha)}.row.good svg{stroke:var(--leaf)}
+.row.warn{background:var(--soft-crema)}.row.warn svg{stroke:var(--crema)}
+.quips{display:grid;gap:4px;font-size:14px;color:var(--muted);margin:6px 0 10px;padding-left:10px;border-left:2px solid var(--latte)}
+.accs{margin-top:14px;border-top:1px solid var(--line)}
+.acc{border-bottom:1px solid var(--line)}
+.acc>summary{list-style:none;display:flex;align-items:center;gap:10px;padding:13px 2px;cursor:pointer;font-weight:600;color:var(--espresso)}
+.acc>summary::-webkit-details-marker{display:none}
+.acc>summary svg{width:18px;height:18px;stroke:var(--crema);flex:none}
+.acc>summary span{flex:1}
+.acc>summary .chev{stroke:var(--muted);transition:transform .2s}
+.acc[open]>summary .chev{transform:rotate(180deg)}
+.acc-b{padding:0 2px 14px 28px;font-size:15px}
+.acc-b p{margin:0 0 8px}.acc-b ul,.acc-b ol{margin:0;padding-left:1.1em}
+.todo{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.todo label{display:flex;gap:12px;align-items:flex-start;background:var(--paper-2);border-radius:14px;padding:12px 14px;cursor:pointer}
+.todo input{position:absolute;opacity:0;pointer-events:none}
+.box-ck{width:22px;height:22px;border-radius:7px;border:1.5px solid var(--latte);display:grid;place-items:center;flex:none;margin-top:2px;background:var(--paper)}
+.box-ck svg{width:15px;height:15px;stroke:var(--paper);opacity:0}
+.todo input:checked+.box-ck{background:var(--matcha);border-color:var(--matcha)}
+.todo input:checked+.box-ck svg{opacity:1}
+.todo input:checked~.tx{color:var(--muted);text-decoration:line-through}
+.todo input:focus-visible+.box-ck{outline:2px solid var(--crema);outline-offset:2px}
+.tx b{display:block;color:var(--espresso)}
+.more-ways{margin-top:12px}
+.tx .para{display:block;margin-top:6px}
+.why{display:block;margin-top:6px;font-size:13px;color:var(--muted);text-decoration:none}
+.buddy{display:flex;gap:10px;margin-top:16px;padding-top:14px;border-top:1px dashed var(--line)}
+.buddy svg{width:20px;height:20px;stroke:var(--crema);flex:none;margin-top:2px}
+.buddy p{margin:2px 0 0;font-size:15px;color:var(--ink-2)}
+.dash{display:grid;grid-template-columns:1fr 1fr;gap:4px 24px}
+@media (prefers-reduced-motion: reduce){.acc>summary .chev{transition:none}}
+
+/* 插画与易读性 */
+.pimg{display:block;width:min(72%,300px);height:auto;aspect-ratio:1;margin:14px auto 6px;border-radius:24px;border:1px solid var(--line);background:var(--paper-2)}
+.hero .eyebrow,.motive .eyebrow{font-size:14px;color:var(--crema);font-weight:700;letter-spacing:.08em}
+.hero .tname{color:var(--espresso)}
+.hero .pre{color:var(--crema)}
+.sec p,.acc-b p{max-width:36em}
+.sec{margin-top:16px}
+.take{color:var(--espresso)}
+.tx b{font-size:16px;margin-bottom:2px}
+.todo label{line-height:1.75}
+.nb{display:inline-block}
+.roastbox{max-width:30em;margin:14px auto 0;display:grid;gap:6px;font-size:15px;color:var(--ink-2)}
+.roastbox p{margin:0}
+.roastbox .r1{font-size:17px;font-weight:700;color:var(--espresso)}
+.sec .cheer{margin:12px 0 10px;text-align:left;max-width:none}
+.dash-col{min-width:0}
+.cheer-row{display:flex;align-items:center;gap:6px;margin:12px 0 10px}
+.cheer-row .cheer{margin:0;flex:1;min-width:0}
+.cmug{width:76px;height:82px;flex:none}
+.share-card .cmug{width:96px;height:104px;display:block;margin:6px auto 0}
+.share-card .sname{font-size:28px}
+.sdash{text-align:left;margin:12px 0 4px}
+.sdash .sg{margin-top:8px}
+.sdash .sg b{font-size:12px;color:var(--muted)}
+.sdash .bar{grid-template-columns:6em 1fr 2em;font-size:13px;margin:3px 0}
+.scheer{font-size:16px;font-weight:700;color:var(--espresso);line-height:1.6;margin:12px 0 0;text-wrap:balance}
+.nh{font-size:16px!important;color:var(--crema)!important;margin:22px 0 6px!important}
+#s-read p{margin:0 0 10px}
+.share-card .simg{display:block;width:150px;height:150px;margin:10px auto 4px;border-radius:20px}
+
+/* 分享 */
+.share-card{background:var(--paper);border-radius:28px;padding:26px 22px;border:2px solid var(--espresso);max-width:360px;margin:0 auto;text-align:center;position:relative}
+.share-card .brandline{font-size:12px;color:var(--muted);letter-spacing:.14em}
+.share-card svg{width:90px;height:96px}
+.share-card .spre{font-size:16px;font-weight:700;color:var(--crema);margin-top:4px}
+.share-card .sname{font-size:32px;font-weight:800;color:var(--espresso);margin:2px 0}
+.share-card .sroast{font-size:14px;color:var(--ink-2)}
+.share-card .srow{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:12px}
+.share-card .foot{font-size:11px;color:var(--muted);margin-top:14px}
+.toggle{display:flex;align-items:center;gap:8px;justify-content:center;font-size:14px;color:var(--ink-2);margin:12px 0}
+.actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:12px}
+#shot{max-width:320px;width:100%;border-radius:20px;display:block;margin:12px auto 0;border:1px solid var(--line)}
+footer{text-align:center;font-size:12px;color:var(--muted);margin-top:28px}
+#about{margin-bottom:14px;font-size:14px;color:var(--ink-2)}
+@media (max-width:520px){
+  .card{padding:18px}
+  .two,.aw,.pair,.dash{grid-template-columns:1fr}
+  .sec{padding:18px}
+  .q-text{font-size:19px}
+  .bar{grid-template-columns:6.5em 1fr 2.2em;font-size:13px}
+}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><span id="logo"></span>马克杯 · 刻度 <span class="original-mark">原创自测</span></div>
+    <button class="ghost" id="aboutBtn" type="button">关于测试</button>
+  </header>
+  <div id="about" class="card" hidden>
+    这个测试通过你在读书阶段的真实反应，看你的学习动力从哪来。它把学习动力拆成四层：你靠什么在学、什么最能给你打鸡血、什么在拖后腿，以及你有没有方向。如果你已经过了读书阶段，按自己读书时的所思所想来填就好。题目参考了自我决定理论、成就目标理论、期望-价值-代价模型和青少年目的感研究，计分规则用十万份随机作答校准过。它是一面镜子，不是诊断，结果只说明“倾向”，不给人贴标签。答案只留在这台设备的页面上，关掉就没了。
+  </div>
+
+  <!-- 封面 -->
+  <section class="screen active" id="screen-intro">
+    <div class="cover">
+      <div class="cover-mug" id="introMug" aria-hidden="true"></div>
+      <h1>测测你的<span>学习动力</span><br>到底从哪来</h1>
+      <div class="pills" id="pills"></div>
+      <form class="access-card" id="accessForm" autocomplete="off">
+        <div class="access-row">
+          <input id="code" type="password" inputmode="numeric" maxlength="4" placeholder="输入四位兑换码" aria-label="兑换码">
+          <button class="btn" type="submit">开始测试</button>
+        </div>
+        <div class="err" id="codeErr"></div>
+      </form>
+    </div>
+  </section>
+
+  <!-- 答题 -->
+  <section class="screen" id="screen-quiz">
+    <div class="progress-box">
+      <span id="quizMug"></span>
+      <div class="progress-main">
+        <div class="progress-meta"><span id="pCount"></span><span id="pHint">选好后点“下一题”</span></div>
+        <div class="progress-track"><div class="progress-fill" id="pFill"></div></div>
+      </div>
+    </div>
+    <div class="card question-card">
+      <div class="q-num" id="qNum"></div>
+      <div class="q-text" id="qText"></div>
+      <div class="options" id="opts"></div>
+      <button class="skip" id="skipBtn" type="button" hidden>这题不想回答，跳过</button>
+    </div>
+    <div class="nav">
+      <button class="ghost" id="prevBtn" type="button">← 上一题</button>
+      <button class="btn" id="nextBtn" type="button" disabled>下一题</button>
+    </div>
+  </section>
+
+  <!-- 无效作答 -->
+  <section class="screen" id="screen-invalid">
+    <div class="card hero">
+      <div id="invMug"></div>
+      <div class="tname" style="font-size:28px">这份答案有点“统一”</div>
+      <p class="roast">几乎每题都选了同一个位置，或者一直在第一个和最后一个之间来回跳。这样算出来的结果不像你。要不要再来一次？凭第一反应就好，不用想太久。</p>
+      <div class="actions"><button class="btn" id="retryBtn" type="button">重新作答</button></div>
+    </div>
+  </section>
+
+  <!-- 结果 -->
+  <section class="screen" id="screen-result">
+    <div id="result"></div>
+  </section>
+
+  <footer>© 马克杯刻度 · 原创自测，未经授权禁止转载。</footer>
+</div>
+
+<div id="loading" hidden><div><div id="loadMug"></div><p style="color:var(--ink-2)">正在给你的动力称重……</p></div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+<script>
+// 学习动力测试：题库与计分（网页和模拟共用这一份）
+// 作答 1–5；null = 跳过（只有敏感题可以跳过）；rev = 反向计分
+// 情境题：每题 5 个真实场景，按顺序计 1–5 分（越往下，这一维越强）
+const ITEMS = [
+  { id: "A1", dim: "自主", t: "你终于搞懂了一道卡了很久的题，那一刻你——",
+    o: ["没啥感觉，直接做下一题","松了口气，但马上又担心别的题会不会","有点开心，但很快就忘了","心里暗爽，忍不住多看两眼解法","爽到想马上找道类似的题再试一次"] },
+  { id: "A2", dim: "自主", t: "学到一个新知识点时，你脑子里一般在想——",
+    o: ["这又要背了","考试会不会考","记住就行，别的不多想","觉得挺有意思，结果越想越偏，跟考试没关系了","马上想到能拿它干点自己想干的事"] },
+  { id: "A3", dim: "自主", t: "老师说“这部分考试不考，了解一下就行”，你——",
+    o: ["直接跳过，省时间", "听一耳朵，左耳进右耳出", "看心情，有意思就听听", "会认真听完，觉得挺有意思", "课后还会自己去多查一点"] },
+  { id: "A4", dim: "受控", t: "如果你连着两三天作业都没认真写，最可能发生的是——",
+    o: ["没人发现，也没人管","偶尔有人随口问一句","家长或老师会提醒几次","很快就会被家长或老师找去谈话","全家都会知道，压力马上就来"],
+    v: [1,2,3,4,5] },
+  { id: "A5", dim: "受控", t: "周末玩了一整天没碰书，晚上躺在床上，你——",
+    o: ["心安理得，玩得很开心", "稍微想了一下，很快睡着", "有点不踏实，但说服了自己", "挺内疚的，打算明天补回来", "越想越慌，爬起来也要学一会儿"] },
+  { id: "A6", dim: "受控", t: "你会认真写作业，最主要是因为——",
+    o: ["想把它弄懂","觉得对自己有用","习惯了，到点就写","不写会被老师或家长说","不写心里过不去，会很内疚"] },
+  { id: "A7", dim: "无动机", t: "有人问你“你为啥要学习”，你的第一反应是——",
+    o: ["张口就能说出自己的理由","想一下，能说出一两个理由","说得出，但都是家长常说的那套","卡住了，只能说“大家都在学”","反问一句：对啊，到底为啥？"],
+    v: [1,2,3,4,5] },
+  { id: "A8", dim: "无动机", t: "一天课上完，回头想想今天，你的感觉是——",
+    o: ["今天学到了挺多有用的","大部分时间没白过","没觉得学了啥有用的，不过离分数又近了一点","只记得玩得挺好、吃得挺好，学了啥不记得","又在学校耗过去了一天"] },
+  { id: "B1", dim: "对标", t: "考试成绩出来，你在班里中间偏上。你最先想的是——",
+    o: ["还行吧，名次跟我关系不大","跟自己上次比了比","看了下自己在班里大概第几","顺手打听了一下比你高几分的是谁","已经盯上比你多几分的那个同学，下次必须超过他"] },
+  { id: "B2", dim: "对标", t: "成绩单发下来，你看的顺序是——",
+    o: ["不太看，直接收起来", "只看自己的分数", "先看自己，再看看平均分", "先看自己，再看看前面几名", "先找自己前面还有谁，挨个对比分数"] },
+  { id: "B3", dim: "高光", t: "老师点你上台给全班讲一道题，你——",
+    o: ["能推就推，太尴尬了","很紧张，一想到还要准备就烦，只想赶紧讲完","正常发挥，不紧张也不兴奋","有点兴奋，会提前准备一下","状态拉满，讲得比平时写得还好"] },
+  { id: "B4", dim: "高光", t: "同学说“这题你都会，挺厉害啊”，你心里——",
+    o: ["有点不自在，甚至怀疑对方在阴阳我","客气一下就过去了","小开心一下","很受用，想下次再被夸","爽翻了，一整天都有劲"] },
+  { id: "B5", dim: "追赶", t: "平时跟你差不多的同学，这次突然考得比你好很多，你——",
+    o: ["无所谓，他考他的","有点意外，然后就忘了","有点酸，但不会做什么","回头找自己哪里没做好，或者打听他最近怎么学的","酸完马上学他的方法，下次一定追回来"] },
+  { id: "B6", dim: "追赶", t: "刷到一个同龄人很厉害的视频（比赛拿奖、自学出成果），你——",
+    o: ["“哦，挺厉害”，然后划走","多半是摆拍吧，谁知道真的假的","羡慕一下，觉得自己做不到","有点不服，点进主页看他怎么做到的","憋着一股劲，当天就想开始做点什么"],
+    v: [1,1,2,4,5] },
+  { id: "B7", dim: "荣誉", t: "你考了一次好成绩，爸妈忍不住跟亲戚朋友说了，你——",
+    o: ["有点烦，这是我自己的事","无所谓，他们开心就好","挺高兴的","很开心，能让他们骄傲挺好的","这就是我努力的意义，下次还要让他们骄傲"] },
+  { id: "B8", dim: "荣誉", t: "有一门考砸了，回家路上你最先想到的是——",
+    o: ["不想了，先打把游戏","反正下次再说","有点难过，不知道回家怎么开口","怕爸妈失望，琢磨怎么跟他们说","觉得对不起家里，已经想好下次怎么补回来"] },
+  { id: "B10", dim: "守门", t: "成绩要在班里公布、或者发到家长群之前，你——",
+    o: ["无所谓，考多少都行","主要在意自己考了多少","希望自己别排在太后面","很怕同学和家长看到我的名次","被人知道考砸了，比考砸本身还难受"] },
+  { id: "B11", dim: "守门", t: "考前同学问你“复习得怎么样了”，你——",
+    o: ["实话实说，复习到哪说到哪","随口说“还行吧”","明明复习了不少，嘴上说“没怎么看”","先说“这次肯定完了”，给自己留个台阶","干脆少复习一点，考砸了也能说“我又没准备”"] },
+  { id: "C1", dim: "看不到用", t: "课上讲到一个好像跟生活没关系的知识点（比如三角函数、文言文虚词），你心里想的是——",
+    o: ["这个以后肯定用得上","说不定哪天用得上","先学着吧，反正要考","除了考试，这辈子大概用不到","学这个跟我的生活有什么关系？"],
+    v: [1,2,3,4,5] },
+  { id: "C2", dim: "看不到用", t: "家长、老师常说“考上好学校，以后才能过得好”，你——",
+    o: ["完全认同","大体同意","很迷茫，不知道该信什么","不太信，身边反例挺多","根本不信，好学校也不保证什么"] },
+  { id: "C3", dim: "学不动", t: "一门你不太擅长的科目，你多花一周复习，你觉得结果会是——",
+    o: ["肯定会进步，我心里有数", "大概会涨一些", "说不准", "估计涨不了多少，我的方法好像不太管用", "跟没复习差不多，以前试过好几次都这样"] },
+  { id: "C4", dim: "学不动", t: "考得不好的时候，你一般觉得问题出在——",
+    o: ["复习得不够，下次多花点时间","粗心了，下次细心点","说不清，可能都有一点","方法可能不太对，但不知道该怎么改","能试的办法都试过了，真的没招了"] },
+  { id: "C5", dim: "电量告急", t: "下课后想到还有一堆任务，你的状态是——",
+    o: ["还有劲，写就写", "有点累，但能开始", "有点累，要先歇一会儿才能开始", "很累，要硬撑着才能开始", "整个人瞬间没电，什么都不想干"] },
+  { id: "C6", dim: "电量告急", t: "你一周里真正属于自己、想干嘛就干嘛的时间有多少——",
+    o: ["很多，过得挺轻松","每天都有一点","只有周末有一点","几乎没有，被各种任务排满了","完全没有，连休息都像在欠债"],
+    v: [1,1,2,3,5] },
+  { id: "C7", dim: "方向盘", t: "选科、填志愿选专业、考不考研这些学习上的决定，一般是——",
+    o: ["我自己决定，家长最多给点建议","我和家长商量着来","家长决定，会问问我","我有自己的想法，但最后拗不过家里","家长直接安排好，我照做"],
+    v: [1,2,4,5,5] },
+  { id: "C8", dim: "方向盘", t: "你想换一种学习方法，或者调整自己的学习计划，通常——",
+    o: ["自己定，不用跟家里说","跟家里说一声就行","会和家长商量一下","得先说服家长，不然不让","基本没机会，学习怎么安排都是家长说了算"],
+    v: [1,1,2,4,5] },
+  { id: "D1", dim: "有方向", t: "有人问你“以后想干什么”，你——",
+    o: ["完全没想过", "想过，但一片空白", "有几个模糊的方向", "有个比较明确的方向", "很清楚，而且已经在为它做准备"] },
+  { id: "D2", dim: "有方向", t: "想到以后，你觉得现在学的东西——",
+    o: ["没什么关系，我感兴趣的东西学校里也不教","可能有一点关系","不确定","以后应该能帮到我在乎的人","很清楚它能帮到谁，这让我更想学"] },
+  { id: "D3", dim: "在找", t: "“人为什么要学习”这个问题，你——",
+    o: ["从来没想过", "想过一次，没结果就算了", "偶尔会冒出来", "最近经常在想", "想了很多，还跟别人聊过"] },
+  { id: "D4", dim: "在找", t: "刷到有人讲“读书到底有什么用”的视频或帖子，你——",
+    o: ["很烦，一看就想划走","看个标题就走","有时会看完","会看完，还翻评论区","会主动去搜，想弄明白"],
+    v: [1,2,3,4,5] },
+];
+// 固定的打乱顺序：同一层的题不挨着
+const ORDER = ["A1","B1","C1","D1","A4","B3","C3","A6","A7","B5","C5","D3","A2","B7","C7",
+  "A3","B2","C2","B10","D2","A5","B4","C4","A8","B6","C6","B11","D4","B8","C8"];
+const SCALE = ["完全不是我", "不太像", "一半一半", "有点像", "这就是我本人"];
+
+const HI = 3.5;
+// 作答存的是选项序号（从 1 开始）；有 v 的题按 v 取分，没有的序号就是分数
+const val = (it, a) => (a == null ? null : it.v ? it.v[a - 1] : a);
+const HONOR_ORDER = ["对标", "追赶", "荣誉", "高光"];
+const BRAKE_ORDER = ["电量告急", "学不动", "看不到用", "方向盘"];
+
+function dims(ans) {
+  const sum = {}, n = {};
+  for (const it of ITEMS) {
+    const v = val(it, ans[it.id]);
+    if (v == null) continue;
+    const s = it.rev ? 6 - v : v;
+    sum[it.dim] = (sum[it.dim] || 0) + s;
+    n[it.dim] = (n[it.dim] || 0) + 1;
+  }
+  const out = {};
+  for (const it of ITEMS) out[it.dim] = n[it.dim] ? sum[it.dim] / n[it.dim] : 2.5;
+  return out;
+}
+
+// 一般人平均分：按中国 MBTI 类型比例模拟 2000 份答卷得出（pop/mbti_sim.js，2026-11-09）
+// 定类型时看“比一般人高多少”，而不是绝对分；仪表盘仍显示原始分
+const BASE = {"自主": 3.19, "受控": 3.02, "无动机": 2.99, "对标": 2.71, "高光": 2.84, "追赶": 2.74, "荣誉": 3.25, "守门": 3.25, "看不到用": 2.79, "学不动": 3.00, "电量告急": 2.69, "方向盘": 2.98, "有方向": 2.99, "在找": 3.20};
+function score(ans) {
+  const raw = dims(ans);
+  const s = Object.fromEntries(Object.entries(raw).map(([k, v]) => [k, v - (BASE[k] ?? 3) + 3]));
+  let main;
+  // 主人设：比一般人高出 0.3 分就算（鸡血、阻力仍是 0.5）
+  const MAIN_HI = 3.3;
+  if (s["自主"] >= MAIN_HI && s["受控"] >= MAIN_HI) main = "双涡轮";
+  else if (s["自主"] >= MAIN_HI) main = "自燃";
+  else if (s["受控"] >= MAIN_HI) main = "外挂";
+  else main = "怠速";
+
+  // 取最高分；同分时先比“最强烈的那一题”，再按答案本身定，不按排列顺序
+  const peak = (k) => Math.max(...ITEMS.filter((it) => it.dim === k).map((it) => val(it, ans[it.id]) ?? 0));
+  const seed = ORDER.reduce((h, id, i) => (h * 31 + (ans[id] || 0) * (i + 7)) % 1000003, 17);
+  const pickTop = (keys) => {
+    const m = Math.max(...keys.map((k) => s[k]));
+    let tied = keys.filter((k) => s[k] === m);
+    if (tied.length > 1) { const pm = Math.max(...tied.map(peak)); tied = tied.filter((k) => peak(k) === pm); }
+    return tied[seed % tied.length];
+  };
+  const best = pickTop([...HONOR_ORDER, "守门"]);
+  const honor = s[best] >= HI ? best : "独行";
+  const top = pickTop(BRAKE_ORDER);
+  const brake = s[top] >= HI ? top : "无";
+
+  const flag = (s["电量告急"] >= 4 && s["无动机"] >= 4 && s["有方向"] <= 2) ||
+    false;
+
+  const seq = ORDER.map((id) => val(ITEMS.find((i) => i.id === id), ans[id])).filter((v) => v != null);
+  const pos = ORDER.map((id) => ans[id]).filter((v) => v != null);
+  const counts = {};
+  pos.forEach((v) => (counts[v] = (counts[v] || 0) + 1));
+  const straight = Math.max(...Object.values(counts)) >= Math.ceil(pos.length * 0.85);
+  // 一直在第一个和最后一个选项之间来回跳，算无效
+  const ends = ORDER.map((id) => { const it = ITEMS.find((i) => i.id === id); const a = ans[id]; return a == null ? null : a === 1 ? "L" : a === it.o.length ? "R" : "M"; }).filter((x) => x != null);
+  let jumps = 0;
+  for (let i = 1; i < ends.length; i++) if (ends[i] !== "M" && ends[i - 1] !== "M" && ends[i] !== ends[i - 1]) jumps++;
+  const nL = ends.filter((x) => x === "L").length, nR = ends.filter((x) => x === "R").length;
+  const edgeStraight = Math.max(nL, nR) >= Math.ceil(ends.length * 0.85);
+  const invalid = straight || edgeStraight || jumps >= 15;
+  return { main, honor, brake, flag, invalid, s: raw, adj: s };
+}
+
+
+
+// 结果页文案。结构：名字 → 吐槽 → 为什么是你（页面按作答生成）→ 解读 → 具体做法
+const MAIN = {
+  自燃: {
+    name: "邪修学霸", cheer: "说真的，没人逼也愿意学，这是最难得的天赋。保护好这份好奇心，它会带你走很远。", gentleName: "一直在发光的人", snoun: "邪修学霸", core: "主动学习者", dims: ["自主"],
+    roast: "没人逼也在学，你是老师梦里才会出现的学生。",
+    read: "你学习的动力主要来自自己：觉得好玩，或者真用得上。这种动力最耐烧，考完试也不会熄火。麻烦在于，碰到不感兴趣的必修课，你可能直接摆出一副“与我无关”的脸。",
+    plus: ["碰到不懂的，会追着问到底", "会把学到的东西用在自己的事上"],
+    minus: ["只学喜欢的科目，不喜欢的能拖就拖"],
+    fact: "人在好奇的时候，大脑的奖赏系统和负责记忆的海马体会一起变活跃，连顺带看到的无关信息都记得更牢。",
+    move: "给最不想碰的那门课找一个“跟我有啥关系”的角度，比如物理和你玩的游戏、数学和你攒的零花钱。写一句就够。",
+    parent: "别急着加任务。孩子自己钻进去的东西，多问一句“这个怎么玩的”，比给奖励管用。",
+  },
+  双涡轮: {
+    name: "烧心卷王", cheer: "说真的，你比大多数人都拼。给自己留点喘气的空间，这股劲会烧得更久。", gentleName: "一直很用力的人", snoun: "烧心卷王", core: "主动+被动学习者", dims: ["自主", "受控"],
+    roast: "一只脚踩“我想学”，一只脚踩“不学挨骂”，两头一起使劲，就是有点累。",
+    read: "你既有自己想学的劲，也有怕挨说、怕内疚的劲，两股加起来，投入程度很高。问题不在动力不够，而在消耗太大：你学得不比谁少，只是更容易累，也更容易焦虑。",
+    plus: ["执行力强，说做就做", "有自己的兴趣点，不全靠别人推"],
+    minus: ["一闲下来就内疚，休息也不踏实"],
+    fact: "比利时一项近万名学生的研究发现，“想学”和“被逼学”都很高的学生，投入程度和只靠“想学”的差不多，成绩掉队的反而更多。",
+    move: "每天留 20 分钟不算学习、也不许内疚的时间。把它写进计划表，当成一项任务来完成。",
+    parent: "少说一句“别人家孩子”。孩子已经很拼了，减掉一点外部压力，他自己那股劲反而烧得更久。",
+  },
+  外挂: {
+    name: "学习牛马", cheer: "说真的，能扛住任务、按时交差，本身就是本事。接下来只差一个属于你自己的理由。", gentleName: "一直在扛着的人", snoun: "学习牛马", core: "被动学习者", dims: ["受控"],
+    roast: "你不是在学习，你是在被学习。",
+    read: "推你往前走的，主要是作业、检查、家里的眼神，还有心里那点罪恶感。这股力能让你按时交作业，可一旦没人盯，速度掉得也快。这不怪你，多数人的学习动力一开始都是外面给的，关键是能不能慢慢换成自己的。",
+    plus: ["规矩感强，该交的都会交", "有人督促时效率不低"],
+    minus: ["只做会被检查的部分", "假期一到直接断电"],
+    fact: "一项汇总了二十多万名学生的分析发现，单靠奖惩撑着的动力，和成绩、坚持都关系不大。能撑住长跑的，是“我自己觉得这事值得”。",
+    move: "在今天的作业里挑一项，自己决定先做哪道、用什么方法。哪怕只是顺序由你定，也算你在开车。",
+    parent: "试着把“快去写作业”换成“你打算先写哪科”。选择权给出去一点，动力才有机会变成孩子自己的。",
+  },
+  怠速: {
+    name: "豆包型学生", cheer: "说真的，想学的劲和被推的劲你都有，这是很好的底子。只要有一股被点着，你会进步得很快。", gentleName: "想慢一点的人", snoun: "豆包型学生", core: "随缘学习者", dims: ["自主", "受控"],
+    roast: "学也行，不学也行，主打一个随缘。",
+    read: "你两股劲都有：自己有点想学，外面也有点推，只是哪一股都还没到让你特别带劲的程度。这其实是最常见的状态。你不缺能力，缺的是一个能让其中一股劲烧起来的理由。",
+    plus: ["两股劲都在，很少完全停下来", "给一点兴趣或一点外力，就能明显往上走"],
+    minus: ["没有截止日期就不动", "容易把“随缘”当成不尝试的理由"],
+    fact: "在大型学习动机研究里，“中等动力”通常是人数最多的一组。你很普通，这是好消息。",
+    move: "这周挑一件跟学习沾点边、你本来就有点好奇的事，比如一个游戏的历史背景、一首歌的歌词。花 20 分钟查到底。",
+    parent: "别把“佛系”当成懒。陪孩子找一件他愿意多花十分钟的事，比讲道理有用。",
+  },
+  雾中: {
+    name: "教室 NPC", cheer: "说真的，不愿意假装有意义，说明你很诚实。理由一旦找到，你的劲会来得比谁都快。", snoun: "教室 NPC", gentleName: "还在找方向的人", core: "迷茫学习者", dims: ["无动机"],
+    roast: "人坐在教室里，魂在别的地方。",
+    gentleRoast: "人坐在教室里，心还没找到方向。",
+    read: "你现在说不太清自己为什么要学，学校里的不少时间也像在耗。这不说明你不行。更常见的原因是，学的东西和你在乎的事之间，一直没人帮你接上线。所以先弄清“为什么”，比硬逼自己学更要紧。一旦找到理由，你的劲会来得很快。",
+    plus: ["不愿意假装，对“没意义”的事很诚实", "还没被错误的动力绑住"],
+    minus: ["越觉得没意义越不想动，越不动越觉得没意义"],
+    fact: "研究发现，“觉得学的东西没价值”比“觉得自己学不会”更能预测一个学生想不想辍学。",
+    move: "写下一件你真正在乎的事：一个人、一个爱好、一个想去的地方。再想想，要把它做得更好，需要会点什么。",
+    parent: "先别问成绩，问问孩子最近在乎什么。把学习和他在乎的东西接上线，是第一步。",
+  },
+  寻路: {
+    name: "奥德赛期选手", cheer: "说真的，愿意追问“为什么”的人，往往走得最远。你已经在路上了。", snoun: "奥德赛期选手", core: "意义寻找者", dims: ["无动机", "在找"],
+    roast: "嘴上说学习没意义，其实一直在找意义。",
+    read: "你暂时没被说服“为什么要学”，但你没躺平，你在找答案：会想，也会去翻别人的经历。“意义感低但还在找”的状态，比“已经不找了”好得多。你只是还没找到属于自己的那个理由。",
+    plus: ["会思考大问题", "愿意看别人怎么走过来的"],
+    minus: ["想得多做得少，答案没找到就不想开始"],
+    fact: "心理学把意义感分成“已经有”和“还在找”两部分。初中前后，“在找”的程度本来就会上升，这是这个年纪的正常现象。",
+    move: "去问一个你觉得活得还挺带劲的长辈或学长学姐：“你当年为什么学？后来用上了吗？”把答案记下来。",
+    parent: "孩子问“为什么要学”时，别急着给标准答案。讲讲你自己当年的真实想法，包括走过的弯路。",
+  },
+};
+
+const HONOR = {
+  对标: {
+    name: "争番位选手", sayAfter: "番位必须往前挪一位", say: "番位必须往前挪一位", stag: "当前一名私生饭", tag: "盯着前一名", dims: ["对标"],
+    roast: "排行榜比课本翻得勤，前面那位同学的名字你比他自己还熟。",
+    read: "你最容易被“追上前面那一个”点燃。研究里，这种想超过别人的劲对成绩有一点帮助，前提是目标清楚、够得着。",
+    use: "只盯前面一两名，或者自己的历史最好成绩。目标太远，人会直接泄气。",
+    careful: "排名靠后时，这股劲容易变成“反正追不上”。成绩出来先看比上次进步了多少，再看排名。",
+  },
+  高光: {
+    name: "学习显眼包", sayAfter: "一有人看就成显眼包", say: "一有人看就成显眼包", stag: "天生显眼包", tag: "想被看见", dims: ["高光"],
+    roast: "观众越多发挥越好，没人看就原地关机。",
+    read: "被看见、被认可对你特别带劲。这不丢人，大脑处理“被夸”和“拿到钱”用的是同一套奖赏系统。",
+    use: "把“被看见”换成“被请教”：给同学讲题、当小老师，最能让你出彩，也学得最牢。",
+    careful: "别只在有观众的时候用力。夸自己时夸方法，比夸“我聪明”更耐用。",
+  },
+  追赶: {
+    name: "嘴硬柠檬精", sayAfter: "嘴上不服，心里柠檬精", say: "嘴上不服，心里柠檬精", stag: "嘴硬柠檬精附体", tag: "不服就追", dims: ["追赶"],
+    roast: "嘴上说“他就是运气好”，晚上偷偷把他的笔记抄了一遍。",
+    read: "别人的成功会变成你的燃料。心理学把这叫“良性嫉妒”，它会让人更努力，前提是你相信对方是靠方法做到的。",
+    use: "找一个靠方法进步的同学，只借他的一个方法，用两周看效果。",
+    careful: "一旦觉得对方靠的是天赋或运气，燃料就会变成酸。多问一句：他具体做了什么？",
+  },
+  荣誉: {
+    name: "别人家的孩子", sayAfter: "一心想当别人家的孩子", say: "一心想当别人家的孩子", stag: "立志当别人家孩子", tag: "想让家人骄傲", dims: ["荣誉"],
+    roast: "你的成绩单要在家族群里接受三代人审阅。",
+    read: "你愿意为在乎的人努力，考砸了也会想着下次改哪一步。这种“为了家人”的劲在中国学生身上很常见，能扛住长期的辛苦。",
+    use: "在“为了家人”之外，再给自己找一个“我自己也想学好它”的理由。两条腿走路更稳。",
+    careful: "别把“我好不好”全押在分数上。分数之外，你的努力和进步也值得家人看到。",
+  },
+  守门: {
+    name: "绷住型选手", sayAfter: "考砸了也必须绷住", say: "考砸了也必须绷住", stag: "必须绷住", tag: "怕考差丢脸", dims: ["守门"], gentle: true,
+    roast: "还没开打，先想好输了怎么解释。其实你没那么容易输。",
+    read: "你很在乎自己在别人眼里的样子，最怕考砸被人看见。这股劲用好了很管用：因为在乎面子，你会把准备做足，很少在人前掉链子。要防的只是一件事：别为了留后路，提前就不努力了。",
+    use: "把怕丢脸变成提前准备：最怕在别人面前丢分的地方，就是最值得先练熟的地方。",
+    careful: "别为了给自己留台阶，故意少复习、嘴上喊“完了”。面子要靠准备挣回来，不靠借口保住。",
+  },
+  独行: {
+    name: "松弛感天花板", sayAfter: "对排名松弛感拉满", say: "排名？松弛感拉满", stag: "松弛感拉满", tag: "不跟别人比", dims: [],
+    roast: "别人卷生卷死，你在旁边嗑瓜子看热闹。",
+    read: "比较和排名对你影响不大，你更愿意按自己的节奏走。这能帮你躲开很多焦虑。",
+    use: "用“跟上周的自己比”代替排名，记一张只属于你的进步表。",
+    careful: "完全不看外部标准，也可能看不到自己落下了多少。偶尔对一下目标就行。",
+  },
+};
+
+const BRAKE = {
+  看不到用: {
+    name: "学了个寂寞", tail: "，但总觉得学了个寂寞", stag: "学了个寂寞", tag: "觉得学了没用", dims: ["看不到用"],
+    roast: "每节课都在质问人生：这玩意儿以后到底能用来干嘛？",
+    read: "学的东西和你的生活之间缺一根线。这个问题问得对，只是学校很少花时间回答。",
+    fix: "挑今天学的一个知识点，写两句话：它跟你的生活、爱好或在乎的人有什么关系。研究里，这种“写写有啥用”的小练习能让人更投入。",
+  },
+  学不动: {
+    name: "肝了不涨分", tail: "，可惜肝了不涨分", stag: "肝了不涨分", tag: "努力了不见效", dims: ["学不动"],
+    roast: "熬了一整晚，成绩纹丝不动，这游戏的经验值系统怕不是有 bug。",
+    read: "你不是不努力，也知道努力有用，只是花了力气，分数就是不动。问题多半出在方法上，可你手里的办法已经试得差不多了。你缺的不是更多努力，而是一个新方法。",
+    fix: "定一个 10 分钟就能完成的小目标，比如把一道错题彻底弄懂。做完打个勾，连着做一周。",
+  },
+  电量告急: {
+    name: "一学就宕机", gentleTail: "，最近需要先充会儿电", tail: "，可惜一学就宕机", stag: "一学就宕机", tag: "学到没电", dims: ["电量告急"],
+    roast: "一听到“写作业”三个字，屏幕自动熄灭。",
+    gentleRoast: "最近电量有点低，先充一会儿。", gentleTag: "需要先充会儿电",
+    read: "你的电量被各种学习任务和安排耗得差不多了。长期的学业倦怠会慢慢拖累心情，所以这时候先充电不算偷懒。",
+    fix: "今天只做一小块：定 15 分钟计时，响了就停。睡觉和放空也算正事。",
+  },
+  方向盘: {
+    name: "投胎满级号", tail: "", stag: "投胎就满级", tag: "受家长影响大", dims: ["方向盘"],
+    roast: "一出生就是满级号，装备家长都给你配好了。就是新手村，你还没自己走过几回。",
+    read: "学什么、怎么选，受家长的影响很大，自己拿主意的机会还不多。这很正常，家长往往是出于关心。只是没有亲手选过的路，人很难打心底里想往前冲。",
+    fix: "找一件你自己愿意选的学习小事：一本课外书、一个想学的技能。自己定时间和方法，坚持一周。",
+  },
+  无: {
+    name: "满血在线", tail: "，目前没什么拖后腿的", stag: "满血在线", tag: "暂时没阻力", dims: [],
+    roast: "目前没什么拖后腿的，先别飘。",
+    read: "几个常见的阻力在你身上都不明显，状态不错。",
+    fix: "趁状态好，把一个长期目标拆成这周能做的第一步。",
+  },
+};
+
+// 结尾 5 分钟练习：自我超越目的写作（Yeager 等 2014）+ 按 Debuff 匹配的小行动
+// 融合人设：Debuff 的 + 鸡血 的 + 人设核心词，共 6×6×5 = 180 种
+function fullName(r, soft) {
+  const b = BRAKE[r.brake], h = HONOR[r.honor], m = MAIN[r.main];
+  const core = m.snoun; // 所有人都用 120 种结果里的名字
+  const line = r.brake === "方向盘" ? `即便是个投胎满级号，还是${h.sayAfter}` : `${h.say}${b.tail}`;
+  return { core, line, short: h.say };
+}
+// 直白版：标签里用
+function plainName(r) {
+  const b = BRAKE[r.brake], h = HONOR[r.honor], m = MAIN[r.main];
+  return { main: m.core, honor: h.tag, brake: b.tag };
+}
+
+const PURPOSE_PROMPTS = [
+  "写下一个你在乎的人，或者一件你在乎的事。",
+  "如果你把现在学的东西学好，以后能怎样帮到这个人，或者让这件事变好一点？写一两句就行。",
+];
+const NAV_PROMPT = {
+  hasDirection: "你说你大概知道以后想干嘛。下一步，你最想先试的是什么？",
+  noDirection: "你最近一次做什么事做到忘了时间？那件事里，有什么是你想变得更厉害的？",
+};
+
+const DIM_LABEL = {
+  自主: "自身动力", 受控: "外界压力", 无动机: "不知道为啥学",
+  对标: "胜负欲", 高光: "表现欲", 追赶: "不服输", 荣誉: "家人期待", 守门: "面子压力",
+  看不到用: "觉得没用", 学不动: "努力不见效", 电量告急: "精力透支", 方向盘: "家长影响",
+  有方向: "知道想去哪", 在找: "正在找答案",
+};
+
+const SAFETY = "看起来你最近挺累，也不太知道学这些是为了什么。这不是你的错，很多人都经历过。如果这种状态已经持续了一段时间，比如一直提不起劲、睡不好、以前喜欢的事也没兴趣了，找一个你信任的家长或老师聊聊会有帮助。也可以拨打全国心理援助热线 12356。";
+
+
+
+// 深入解读：性格倾向 / 背后的心理 / 可能的原因 / 和大脑的关系 / 长期怎么办
+// 说明：性格只写“常一起出现的倾向”，不是诊断；脑科学多为小样本研究，只说明方向。
+const DEEP = {
+  main: {
+    自燃: {
+      trait: "你常常好奇心强、喜欢新东西。做事看兴趣，自己定的目标坚持得住，别人硬塞的就不一定了。",
+      psych: "心理学叫它“自主动机”：要么学习本身让你满足，要么你真心认同它有用。自我决定理论说，人有三种基本需要：自己做主、觉得自己行、和别人有连接。在学习这件事上，你这三样大多被满足了。",
+      factors: ["有过“自己钻研出结果”的爽感", "家里或老师给过选择的空间", "学的东西和兴趣有交集"],
+      brain: "人好奇的时候，大脑里分泌多巴胺的中脑区域和管记忆的海马体会一起活跃，连顺带看到的东西都记得更牢（Gruber 等，2014）。能自己做选择这件事，本身就会让大脑的奖赏区有反应（Leotti & Delgado，2011）。反过来要小心：给本来喜欢的事加上外部奖励，奖励一撤，相关脑区的反应会掉下去，心理学叫“破坏效应”（Murayama 等，2010）。",
+      cope: ["给不喜欢的必修课写两句“它跟我关心的事有什么关系”。研究发现这种写作能提高投入，对没信心的学生效果最明显（Hulleman & Harackiewicz，2009）", "对不感兴趣的科目定一个最低线，比如每天 15 分钟，别让“没兴趣”变成拖延的理由", "别让刷分、打卡、奖励取代原本的乐趣"],
+    },
+    双涡轮: {
+      trait: "你多半责任心强、对自己要求高，容易有点完美主义。",
+      psych: "你身上有两种动力：自己想学，以及“必须学”。后者心理学叫“内摄”，就是用内疚、面子、自尊逼自己。两股加起来，投入程度很高，但消耗也大，休息时也很难真正放松。",
+      factors: ["本身有兴趣，又处在高期待的环境里，比如家里或重点班", "习惯用成绩证明自己", "很少被允许“差不多就行”"],
+      brain: "有人评价你、结果又不由你控制的场合，身体的压力激素皮质醇升得最多。一项汇总了 208 个实验的分析发现，这种组合的效应是普通压力的两到三倍（Dickerson & Kemeny，2004）。想学的那部分动力还在，只是一直在被压力“抽税”。",
+      cope: ["把今天的任务列出来，标出哪些是“我想”、哪些是“我必须”。先做一件“我想”的", "把休息写进计划表，当成任务完成", "考前只定过程目标，比如今天搞懂哪两类题，别定名次"],
+    },
+    外挂: {
+      trait: "你多半守规矩、配合度高，对外部要求很敏感，自己做主的习惯可能还没练出来。",
+      psych: "主要靠外面推着走：怕被说、怕被罚，或者不学会内疚。心理学叫“受控动机”。它启动快，但不耐烧，没人盯着就容易熄火。这不是你的问题，多数人一开始都是这样，关键是慢慢把动力换成自己的。",
+      factors: ["自己拿主意的机会不多", "学习一直和检查、奖惩绑在一起", "还没找到学习和自己在乎的事之间的联系"],
+      brain: "奖惩确实能推动大脑的奖赏系统，但奖惩一停，反应就下降（Murayama 等，2010）。好消息是，能自己做选择时，大脑会把“选择”本身当成奖励（Leotti & Delgado，2011）。所以把动力换成自己的，可以从“自己选”这件小事开始。",
+      cope: ["每天留一件由你决定的学习小事：先做哪科、用什么方法、几点开始", "把“为了不被骂”改写成“为了____”，填上一个你自己的理由", "用“如果……就……”提前定好计划，比如“如果到了 7 点，我就先写数学”。多项研究汇总发现，这种写法能稳定地提高执行率，效果不大但很实在（Gollwitzer & Sheeran，2006）"],
+    },
+    怠速: {
+      trait: "你自己有点想学，外面也有点推，两股劲都在，只是哪一股都还没带起节奏，所以学习状态常常要看科目、看老师、看当天的状态。",
+      psych: "想学和被推两股劲你都有，都在中间。不是没动力，是还没有一个足够让你上头的理由。按“期望-价值”理论的说法，你觉得学习的价值一般，代价也一般，所以就维持在不温不火。",
+      factors: ["学的内容和兴趣交集少", "还没遇到让自己有成就感的科目", "还没找到一个让自己特别想冲的学习目标"],
+      brain: "大脑对“有点难、但我大概能做到”的问题最好奇。实验发现，这种中等把握的问题最能激活奖赏区，答案也记得最牢（Kang 等，2009）。太简单或太难，大脑都提不起劲。",
+      cope: ["给自己找一个“有点难但能做到”的小挑战，比如一周搞定一个专题", "找一个在认真学的朋友搭伙，约好一起学一小时", "每周记一次进步，让成就感能看得见"],
+    },
+    雾中: {
+      trait: "往往比较诚实，不愿意假装觉得有意义。也可能是最近情绪偏低、对很多事都提不起劲，这一点值得留意。",
+      psych: "心理学叫“无动机”：要么觉得学了没价值，要么觉得结果不由自己控制，或者两者都有。它不是懒，只是还没找到一个说服自己的理由。",
+      factors: ["学的东西和真实生活脱节", "努力过但没看到回报", "长期疲惫", "身边缺少一个让你觉得“这样活挺带劲”的人"],
+      brain: "长期的压力和疲惫会让大脑对奖励不那么敏感，于是什么都显得没意思。“意义感”和大脑判断“这件事跟我有关吗”的区域有关：有研究发现，先想一想自己看重什么，这块区域（腹内侧前额叶）会更活跃，人也更愿意做出改变（Falk 等，2015）。",
+      cope: ["先确认自己是不是太累了，睡够再说", "写下一个你在乎的人或事，再想想学好现在的东西能怎样帮到它。这种“目的感”写作在实验里提高了学生的坚持度（Yeager 等，2014）", "找一个你佩服的长辈或学长学姐，问问“你当年为什么学”", "如果低落、没兴趣的状态持续两周以上，找信任的人聊聊"],
+    },
+    寻路: {
+      trait: "爱思考大问题，反思能力强。有时想得多、做得少。",
+      psych: "心理学把意义感分成“已经有”和“还在找”两部分（Steger 等，2006）。你“还在找”的分数高。这在青春期很常见，属于搞清楚“我是谁”的正常过程，比“已经不找了”好得多。",
+      factors: ["抽象思考能力和自我意识正在变强", "接触了很多“读书有没有用”的说法", "还没亲身体会过学习带来的回报"],
+      brain: "青春期的大脑在“想自己”这件事上特别活跃：研究发现，孩子和青少年评价自己时，内侧前额叶的反应比成年人更强（Pfeifer 等，2007）。负责长远规划的前额叶要到二十多岁才完全成熟，所以现在“想不清楚”很正常。",
+      cope: ["用行动找答案：试一件小事，看自己喜不喜欢，比单纯想有效", "采访一个长辈或学长学姐：“你当年为什么学？后来用上了吗？”", "把你现在的答案写下来，一个月后再看，看看变了没有"],
+    },
+  },
+  honor: {
+    对标: {
+      trait: "好胜，目标感强，喜欢有清楚的标尺。",
+      psych: "心理学叫“表现-趋近目标”，就是想比别人好。研究发现它对成绩有一点帮助，前提是目标够得着；目标太远，人反而泄气。",
+      factors: ["班里有比较的氛围", "以前靠追赶尝到过甜头", "喜欢能量化的反馈"],
+      brain: "一个小样本实验发现，拿到同样的奖励时，比搭档拿得多的人，大脑奖赏区（腹侧纹状体）反应更强，说明大脑确实会算“比别人多多少”（Fliessbach 等，2007）。",
+      cope: ["只盯前面一两个人，或者自己的历史最好成绩", "成绩出来先看进步了多少，再看名次", "名次后退时，切换成“和上周的自己比”"],
+    },
+    高光: {
+      trait: "偏外向，表现欲强，对别人的反应很敏感。",
+      psych: "想被认可、想因为有本事被尊重，这在心理学里叫“声望动机”，是人类普遍的需要，不是虚荣（Anderson 等，2015）。",
+      factors: ["以前因为表现好被夸过", "青春期对同龄人的目光特别敏感"],
+      brain: "被别人正面评价和拿到钱，激活的是大脑里同一块奖赏区（Izuma 等，2008）。另一个实验发现，以为有同龄人在看着自己时，尴尬感和内侧前额叶的反应都在青春期达到最高（Somerville 等，2013）。",
+      cope: ["把“被看见”换成“被请教”：给同学讲题，学得最牢", "夸自己时夸方法，不夸“我聪明”", "没人看的时候，也给自己设一个能打勾的小目标"],
+    },
+    追赶: {
+      trait: "不服输，自尊心强，但能把不爽变成行动。",
+      psych: "心理学叫“良性嫉妒”：看到别人比自己强，想把自己提上去，而不是希望对方倒霉。它能让人更努力，前提是你相信差距能靠方法缩小。",
+      factors: ["身边有水平接近、可以比的人", "相信能力是可以练出来的"],
+      brain: "对方的优势出现在你在乎的领域时，大脑里处理冲突和痛苦的前扣带皮层反应更强，所以“酸”的感觉格外明显（Takahashi 等，2009）。",
+      cope: ["从对方身上只借一个方法，试两周看效果", "多问一句“他具体做了什么”，别停在“他运气好”", "如果发现自己开始希望对方倒霉，先离开比较，那已经不是能帮你的那种嫉妒了"],
+    },
+    荣誉: {
+      trait: "重感情，有责任感，很在意家人。",
+      psych: "为在乎的人努力，在东亚学生里很常见，也能让人扛住长期的辛苦。需要小心的是，如果把“我好不好”全押在分数上，心理学叫“条件性自我价值”，压力会越来越大。",
+      factors: ["家里对学习的期待高", "和家人关系亲近", "以前用成绩让家人开心过"],
+      brain: "一项青少年研究发现，为家人付出时，大脑奖赏区也会亮起来；越看重家庭责任的孩子，这种反应越强（Telzer 等，2010）。所以“为家人学”是真有奖励感的，不是假装。",
+      cope: ["在“为了家人”之外，再给自己找一个“我自己也想学好它”的理由", "考砸后把注意力放在“下次改哪一步”，而不是“对不起谁”", "和爸妈约好：多聊过程，少聊名次"],
+    },
+    守门: {
+      trait: "敏感，自尊心强，很在意别人的看法，有时追求完美。",
+      psych: "核心是怕失败被看见。心理学叫“表现-回避目标”，常和羞耻感一起出现。有时人会提前不努力，好让失败有个借口，这叫“自我设障”，是在保护自尊。这股劲背后，其实是你很在乎。",
+      factors: ["经常被公开比较", "考砸后听到的是“你怎么这么笨”，而不是“方法哪里不对”", "把分数当成对自己这个人的评价"],
+      brain: "既有人评价、结果又不由自己控制的场合，皮质醇升得最多（Dickerson & Kemeny，2004）。羞耻感比内疚更容易引发身体的应激反应。所以“怕丢脸”不只是想法，身体也真的在紧张。",
+      cope: ["考前一周，把最怕在别人面前丢分的题型列出来，一个个练到稳。你越在乎面子，这份清单就越好用", "先在没人看的地方把错犯完：自己计时做套题、自己批改，等到正式考试时，心里就有底了", "给自己定一个拿得出手、又够得着的目标，比如这次某一科比上次多 5 分。做到了，这就是你的面子"],
+    },
+    独行: {
+      trait: "独立，按自己的节奏来，不容易被外界带着跑。",
+      psych: "你不太受比较驱动。可能更习惯和自己比，也可能只是对排名没感觉。这能帮你躲开很多焦虑。",
+      factors: ["没有处在很强的排名压力里", "对自己的评价比较稳定"],
+      brain: "这一类的脑科学研究不多。能说的是，少受别人评价的影响，就少了一个让压力激素升高的来源。",
+      cope: ["每周和过去的自己比一次，记在一张进步表上", "偶尔对一下外部目标，比如升学要求，防止落下太多", "找一个你认可的榜样，当作方向，而不是对手"],
+    },
+  },
+  brake: {
+    看不到用: {
+      trait: "务实，凡事要问“这有什么用”。这个问题问得没错。",
+      psych: "心理学叫“效用价值低”：觉得学的东西对自己没用。好消息是，这是最容易改善的一种阻力：只要找到一个和自己有关的用处，投入就会明显上来。",
+      factors: ["课本内容和生活脱节", "没人解释过“学这个干嘛”", "身边有“读书无用”的声音"],
+      brain: "大脑对“跟我有关”的信息格外上心：和自己有关的内容，会调动内侧前额叶，也记得更牢，心理学叫“自我参照效应”。学的东西一旦和你挂上钩，大脑就更愿意存下来。",
+      cope: ["今天挑一个知识点，写两句它和你的生活、爱好有什么关系（Hulleman & Harackiewicz，2009）", "问老师或搜一下：现实中谁在用这个", "找一个用到它的职业、游戏或作品"],
+    },
+    学不动: {
+      trait: "通常努力过，也挺执着，只是试过的办法都不太管用，有点没招了。",
+      psych: "心理学的归因研究发现，把失败归到“方法不对”的人，比归到“我不行”或“运气差”的人更愿意坚持，因为方法是能换的。你现在就站在这个位置上：知道努力有用，只是方法没找对。要小心的是，没招的时间太长，人会慢慢滑向“试了也没用”，心理学叫“习得性无助”。",
+      factors: ["方法不对，导致努力白费", "基础有缺口，越往后越吃力", "反馈太慢，要等一次大考才知道结果"],
+      brain: "习得性无助研究的最新结论是：被动其实是大脑面对压力时的默认反应；人是靠一次次“我能控制”的体验，让前额叶学会压住这种反应（Maier & Seligman，2016）。所以换一个方法、拿到一次小小的成功，比咬牙硬撑更管用。",
+      cope: ["定一个 10 分钟就能看到结果的小目标，比如把一道错题彻底弄懂", "做错题本，把丢分写成具体原因（“公式记错了”），别写“我笨”", "向学得好的同学或老师要一个具体方法，比如错题怎么整理、这类题先看哪里，照着用两周，再看分数有没有动"],
+    },
+    电量告急: {
+      trait: "往往认真负责，正因为一直在硬撑，才会被耗空。",
+      psych: "心理学叫“学业倦怠”：很累，对学习越来越疏远，还容易怀疑自己。它说明你已经硬撑了很久，不说明你不行。",
+      factors: ["学习任务太多", "睡得少", "几乎没有自己的时间", "长期处在高压里"],
+      brain: "睡眠不足会削弱前额叶对情绪的控制，让负责警报的杏仁核反应变强，人更容易烦躁、提不起劲（Yoo 等，2007）。对成年人的研究也发现，倦怠的人大脑里调节情绪的连接变弱了（Golkar 等，2014）。",
+      cope: ["先保证睡眠，这是最便宜的充电", "学的时候定 15 分钟计时，响了就停一下", "每天留一段完全不学的时间", "如果持续低落、睡不好、对喜欢的事也没兴趣，找信任的家长或老师聊聊"],
+    },
+    方向盘: {
+      trait: "重视家人的意见，懂得配合，自己做主的机会还不多。",
+      psych: "自我决定理论认为，人对自己选的事更有动力。学习上的决定受家长影响越大，越难觉得“这是我自己要做的”，所以没人提醒时就不太想动。",
+      factors: ["选科、志愿、计划，家长的意见分量很重", "家长出于关心，替你考虑得比较多", "试错的空间比较小"],
+      brain: "能自己选，大脑会把“选择”本身当成奖励（Leotti & Delgado，2011）。自己选的任务，失败后也更能坚持下去（Murayama 等，2015）。",
+      cope: ["从小事开始自己拿主意：自己定一项学习计划，执行一周", "跟家长聊聊：“这件事让我自己试一次”", "给自己的选择留一个检验期，结果不好就调整，别急着放弃"],
+    },
+    无: {
+      trait: "目前状态平稳。",
+      psych: "几种常见的阻力在你身上都不明显：觉得学了有用，努力也有回报，电量还够，也有一定的自主权。",
+      factors: ["节奏合适", "睡眠和支持都够"],
+      brain: "压力可控、休息充足时，前额叶能更好地做计划和调节情绪，这正是长期目标最需要的状态。",
+      cope: ["趁状态好，把一个长期目标拆成这周能做的第一步", "保持睡眠和节奏", "留意自己哪天开始累了，早点调整"],
+    },
+  },
+};
+const DEEP_NOTE = "脑科学研究大多是小样本实验，只能说明一种倾向，不能用来给人下结论。";
+
+
+// 个性化分析：全部根据 14 项分数和作答生成，不是按类型套模板
+const HI_ = 3.5;
+
+// 1. 你心里的矛盾：两股劲同时高时才触发，强度取两者较小值
+const TENSIONS = [
+  { a: "自主", b: "方向盘", title: "你有火，但方向盘不全在你手里",
+    text: "你自己是想学的，可学什么、怎么选，受家长的影响很大。你烦的往往不是学习本身，而是“不是自己选的”。只要多一点自己拿主意的空间，你的劲会大很多。" },
+  { a: "对标", b: "守门", title: "又想赢，又怕输",
+    text: "你盯着前面的人想超过，同时又很怕考砸被看见。所以越重要的考试，你越紧张，有时甚至会先给自己找好退路。想赢是燃料，怕输是刹车，你常常两脚一起踩。" },
+  { a: "无动机", b: "在找", title: "嘴上说没意义，其实最想知道意义",
+    text: "你现在说不清为什么要学，但你没有放弃这个问题，一直在想、在翻别人的答案。真正无所谓的人不会这样。你缺的不是动力，是一个能说服自己的理由。" },
+  { a: "自主", b: "电量告急", title: "想学，但没电了",
+    text: "你本来对学东西有兴趣，可现在被各种任务耗得差不多了。这不是你变懒了，而是兴趣被疲惫盖住了。先充电，兴趣会自己回来。" },
+  { a: "高光", b: "守门", title: "想被看见，又怕被看见考砸",
+    text: "被关注时你会发挥得更好，可你也最怕在别人面前失手。同一束聚光灯，既是你的动力，也是你的压力。" },
+  { a: "荣誉", b: "守门", title: "想让家人骄傲，也怕让家人丢脸",
+    text: "为家人争光是你很重要的动力，但它的另一面是：一旦考砸，你会觉得自己让全家失望。这股压力比你嘴上说的大。" },
+  { a: "对标", b: "学不动", title: "一直在追，名次却不动",
+    text: "你在意名次，也肯花力气，可分数就是上不去。这种状态最消耗人：一边逼自己，一边开始怀疑自己。其实缺的多半不是努力，是方法，换一个方法试两周，比继续硬追重要。" },
+  { a: "追赶", b: "学不动", title: "不服气，但没招了",
+    text: "看到别人比你强，你会不服，也想追，可自己的办法都试过了，差距还是没缩小。别和对方比结果，先借他的一个方法，让自己看到一次进步。" },
+  { a: "有方向", b: "看不到用", title: "知道想去哪，却觉得现在学的跟它没关系",
+    text: "你对以后有想法，但觉得课本和那个方向不沾边。其实很可能是没人帮你把两者连起来。试着找一找：你想做的事里，哪一门课的知识藏在里面。" },
+  { a: "受控", b: "看不到用", title: "在认真学，却不信它有用",
+    text: "你会被推着按时完成任务，但心里并不觉得这些东西有什么用。这种“做是做了，心不在”的状态，时间长了很容易累。" },
+  { a: "荣誉", b: "方向盘", title: "为家人学，路也多听家人的",
+    text: "你很在乎家人的期待，学习上的决定也很受他们影响。这让你很少有机会问自己：我自己想要什么？这个问题值得你开始想一想。" },
+  { a: "受控", b: "电量告急", title: "被推着跑，跑到没电",
+    text: "推你的力量还在，可你的电量已经不多了。外面越推，你越累。现在需要的不是再加一把劲，而是先让自己喘口气。" },
+];
+function pickTensions(s) {
+  return TENSIONS.filter((t) => s[t.a] >= HI_ && s[t.b] >= HI_)
+    .map((t) => ({ ...t, k: Math.min(s[t.a], s[t.b]) }))
+    .sort((x, y) => y.k - x.k).slice(0, 2);
+}
+
+// 2. 王牌与软肋
+const ACE = {
+  自主: "你最大的本钱，是你自己真的想学。这种动力最耐烧，没人盯着也不容易熄火。",
+  有方向: "你最大的本钱，是你大概知道自己想去哪。有方向的人，吃苦的时候更扛得住。",
+  在找: "你最大的本钱，是你还在认真找答案。愿意问“为什么”的人，找到理由后往往走得最远。",
+  对标: "你最大的本钱，是好胜心。一个清楚的目标，就能让你迅速进入状态。",
+  追赶: "你最大的本钱，是不服输。别人的厉害，会被你变成自己的燃料。",
+  高光: "你最大的本钱，是被看见时的爆发力。有观众、有舞台的时候，你能发挥出超出平时的水平。",
+  荣誉: "你最大的本钱，是你在乎的人。为了他们，你能扛住很长时间的辛苦。",
+};
+const WEAK = {
+  无动机: "找到一个属于自己的理由，你的劲会持久得多。",
+  守门: "把“怕丢脸”变成“提前准备”，最怕丢分的地方先练熟，你会越来越有底气。",
+  看不到用: "给学的东西找到一个和你有关的用处，你会更愿意投入。",
+  学不动: "换一个新方法，拿到一次小小的进步，你的努力就会重新开始见效。",
+  电量告急: "先把电充回来，你本来的劲就会回来。",
+  方向盘: "多给自己一点拿主意的机会，动力会慢慢变成你自己的。",
+  受控: "把一部分“被推着学”换成“我想学”，你会走得更久。",
+};
+const CHEER = {
+  自主: "你最大的本钱是自己想学，别让任何人把它磨掉。",
+  有方向: "你知道自己想去哪，这比什么都重要。",
+  在找: "还在找答案的人，最后往往最清楚自己要什么。",
+  对标: "你的好胜心是好东西，对准一个够得着的目标就够了。",
+  追赶: "不服输的人，迟早会追上来。",
+  高光: "你天生适合被看见，那就让大家看见你的进步。",
+  荣誉: "你在乎的人会为你骄傲，你也值得为自己骄傲。",
+};
+function aceAndWeak(s) {
+  const ace = Object.keys(ACE).sort((a, b) => s[b] - s[a])[0];
+  const weak = Object.keys(WEAK).sort((a, b) => s[b] - s[a])[0];
+  return {
+    ace: s[ace] >= 3 ? { dim: ace, text: ACE[ace] } : { dim: null, text: "你还没有哪一股劲特别突出。这也意味着你没被哪种动力定型，往哪边长都还来得及。" },
+    weak: s[weak] >= 3 ? { dim: weak, text: WEAK[weak] } : { dim: null, text: "目前没有明显的阻力，这是很好的底子，保持住就行。" },
+    cheer: s[ace] >= 3 ? CHEER[ace] : "你现在的样子不是定局，动力是可以一点点养出来的。",
+  };
+}
+
+// 3. 动力配方：自己想学 / 被推着学 / 和别人比较
+function fuelMix(s) {
+  const social = ["对标", "高光", "追赶", "荣誉"].map((d) => s[d]).sort((a, b) => b - a);
+  const raw = { own: Math.max(0.1, s["自主"] - 1), push: Math.max(0.1, s["受控"] - 1), social: Math.max(0.1, (social[0] + social[1]) / 2 - 1) };
+  const sum = raw.own + raw.push + raw.social;
+  const pct = { own: Math.round(raw.own / sum * 100), push: Math.round(raw.push / sum * 100) };
+  pct.social = 100 - pct.own - pct.push;
+  let verdict;
+  if (pct.own >= 45) verdict = "你的动力大部分来自自己，最能持久。就算没人盯、没人比，你也能慢慢往前走。";
+  else if (pct.push >= 40) verdict = "被推着学的动力占得多，起步快，但不太持久，外面一松，速度就会掉。最值得做的，是慢慢把一部分换成自己想学的动力。";
+  else if (pct.social >= 40) verdict = "和别人比较的动力占得多，有对手时很猛，没对手就容易松下来。换个环境，你的状态可能变化很大。";
+  else verdict = "三种动力差不多，比较均衡。好处是不容易一下子没劲，代价是哪一种都不算特别强。";
+  if (s["电量告急"] >= HI_) verdict += " 另外，你现在有点累，动力再足也得先休息好。";
+  return { pct, verdict };
+}
+
+// 4. 情境预测：每个场景按最相关的分数挑一句
+function predict(s, r) {
+  const top = (pairs) => pairs.filter(([d]) => s[d] >= 3).sort((a, b) => s[b[0]] - s[a[0]])[0];
+  const pick = (pairs, fallback) => (top(pairs) || [null, fallback])[1];
+  return [
+    { when: "考前一周", text: pick([
+      ["守门", "你会越来越紧张，复习效率反而下降，可能还会忍不住刷手机，给自己留一个“我没好好准备”的台阶。"],
+      ["对标", "你会忍不住打听别人复习到哪了，别人多做一套卷子，你就想做两套。"],
+      ["受控", "你会熬夜，越复习越觉得不够，躺下了还在想没背完的东西。"],
+      ["电量告急", "你知道该复习了，但打开书就犯困，最后两三天才勉强进入状态。"],
+      ["自主", "你会按自己的节奏来，喜欢的科目复习得特别细，不喜欢的就草草带过。"],
+    ], "你会在最后两三天才进入状态，前面几天总觉得“还早”。") },
+    { when: "放长假", text: pick([
+      ["方向盘", "第一周彻底放飞，作业等着开学前几天集中“抢救”。"],
+      ["电量告急", "前几天什么都不想干，只想睡觉、躺着，先把电充回来。"],
+      ["自主", "你会把时间花在自己感兴趣的东西上，学到的可能不少，但不一定是作业。"],
+      ["受控", "你会定一个满满的计划，执行到一半开始内疚，然后再定一个新计划。"],
+    ], "计划做得挺好，执行一半，剩下的交给开学前的自己。") },
+    { when: "考砸后被说了几句", text: pick([
+      ["守门", "你表面上说“没事”，心里会反复冒出一句：我是不是真的不行。"],
+      ["荣誉", "你最难受的不是被说，而是看到家里人失望的表情。"],
+      ["学不动", "你会想：说了又怎样，反正试过的办法都不太管用。"],
+      ["追赶", "你会憋着一口气，下次一定要证明给对方看。"],
+      ["受控", "你会马上开始补，但更多是为了让对方别再说了。"],
+    ], "你会难受一会儿，然后该干嘛干嘛，不会太往心里去。") },
+    { when: "成绩出来那一刻", text: pick([
+      ["对标", "你第一眼找的不是自己的分数，而是前面那几个人考了多少。"],
+      ["守门", "你会先确认有没有人在看你的卷子，然后才敢仔细看分数。"],
+      ["荣誉", "你会先想：这个分数回家怎么说。"],
+      ["高光", "你会在意谁看到了你的成绩，考得好时巴不得大家都知道。"],
+      ["追赶", "你会去看那个跟你差不多的同学考了多少。"],
+    ], "你看完自己的分数就收起来了，对别人考多少兴趣不大。") },
+  ];
+}
+
+// 5. 使用说明书（给身边的人看）
+const PRAISE = {
+  对标: "说我这次超过了谁、进步了几名。具体的名次变化比一句“真棒”有用得多。",
+  高光: "当着别人的面夸，效果翻倍。",
+  追赶: "夸我学别人方法学得快、追得猛。",
+  荣誉: "让我知道家里人为我骄傲，但别只夸分数，也夸我有多拼。",
+  守门: "私下夸，夸努力和方法，别当众夸分数，那会让我下次更怕考砸。",
+  独行: "夸我跟自己比的进步，别拿我跟别人比。",
+};
+const DONT = {
+  对标: "“你看人家第一名”：目标太远，我只会泄气。",
+  高光: "“没人看你就不学了？”：这会让我觉得被看穿，更不想动。",
+  追赶: "“人家就是比你聪明”：这会让我的不服气变成放弃。",
+  荣誉: "“你对得起我们吗”：这会把我的动力变成负担。",
+  守门: "当众念分数，或者说“你怎么这么笨”。",
+  独行: "“你怎么一点好胜心都没有”：我有自己的节奏。",
+  看不到用: "“让你学就学，哪来那么多为什么”：我问的恰恰是最关键的问题。",
+  学不动: "“你就是不够努力”：我可能已经很努力了，缺的是方法。",
+  电量告急: "“别人都能扛，你怎么不行”：我已经在硬撑了。",
+  方向盘: "“听我的就对了”：我需要的正是自己做主的机会。",
+};
+const NEED = {
+  自燃: "空间和好问题。别把我的兴趣变成任务。",
+  双涡轮: "允许休息的许可。我最缺的不是动力，是“可以停一下”。",
+  外挂: "一点选择权，从“先做哪科”这种小事开始。",
+  怠速: "一个有点难、又能做到的挑战。",
+  雾中: "先被理解，再谈学习。听我说说在乎什么。",
+  寻路: "有人愿意陪我聊“为什么要学”，而不是直接给标准答案。",
+  看不到用: "有人帮我把知识和生活连起来。",
+  学不动: "具体的方法，和看得见的小进步。",
+  电量告急: "睡眠，和一段不被打扰的时间。",
+  方向盘: "自己做决定、也允许做错的机会。",
+};
+function manual(r) {
+  const dont = [DONT[r.honor], DONT[r.brake]].filter(Boolean);
+  const need = [NEED[r.main], NEED[r.brake]].filter(Boolean);
+  return { praise: PRAISE[r.honor], dont, need };
+}
+
+// 6. 最佳搭子
+const BUDDY = {
+  自燃: { with: "外挂", who: "那种不管喜不喜欢，作业都按时交的同学", why: "他执行力强，能帮你把不喜欢的科目也按时做完；你的兴趣能让他发现学习也可以有意思。" },
+  双涡轮: { with: "怠速", who: "那种心态特别稳、考差了也不慌的同学", why: "他能帮你松一松，提醒你不用每件事都拼尽全力；你能带他紧一紧，给他一点冲劲。" },
+  外挂: { with: "自燃", who: "那种没人催也会自己找题做、聊起某门课眼睛会发光的同学", why: "他能让你看到学习好玩的一面，帮你找到自己的理由；你的规律和执行力，正好补他拖延的毛病。" },
+  怠速: { with: "双涡轮", who: "那种干劲很足、做什么都想做好的同学", why: "他的冲劲能带你进入状态；你不走极端，能帮他别把每件事都逼得那么紧。" },
+  雾中: { with: "自燃", why: "跟一个真心觉得学习有意思的人待在一起，比听一百遍道理更能帮你找到理由。" },
+  寻路: { with: "外挂", why: "你想得多，他做得多。他帮你把想法变成行动，你帮他想清楚为什么要做。" },
+};
+
+// 7. 适合你的学习方式
+const METHOD_H = {
+  对标: "限时小测、和固定的对手比赛刷题。给自己一个看得见的对手。",
+  高光: "学完讲给别人听，或者录成一分钟小视频。讲得出来，才是真的会了。",
+  追赶: "找一个比你强一点的人，拆解他的一个方法，照着用两周。",
+  荣誉: "和家人约一个小目标，完成后一起庆祝，过程比分数重要。",
+  守门: "多做没人看的模拟练习，把“第一次失误”留在低风险的地方。",
+  独行: "自己定计划，做一张进度表，只和过去的自己比。",
+};
+const METHOD_M = {
+  自燃: "围绕一个你好奇的问题去学，带着问题找答案。",
+  双涡轮: "番茄钟加强制休息：学 25 分钟，必须停 5 分钟。",
+  外挂: "固定时间、固定地点，把学习做成不用想的习惯。",
+  怠速: "闯关制：把内容拆成小关卡，每关有一点难度。",
+  雾中: "先从和兴趣有关的一小块开始，不用一下子面对全部。",
+  寻路: "每学完一章，写一句“它回答了我什么问题”。",
+};
+const METHOD_B = {
+  看不到用: "每学一个知识点，先花一分钟查“它在现实里用在哪”。",
+  学不动: "错题本只写具体原因，每周挑三道重做，看得见自己在进步。",
+  电量告急: "学 15 分钟就停，睡够觉之后再谈效率。",
+  方向盘: "每周至少有一项学习计划由你自己定。",
+};
+function methods(r) {
+  return [METHOD_M[r.main], METHOD_H[r.honor], METHOD_B[r.brake]].filter(Boolean);
+}
+
+// 8. 启动困难工具箱：按“是什么让开始变难”分类（依据见《学习启动困难的应对方法》报告）
+const WARMUP = "热身阶梯：学不进去时，先放纯音乐、白噪音或自习直播，做 10–15 分钟抄写这类简单的事；再做中等难度的题；最难、要记要想的部分，关掉声音再做。热身别超过 15 分钟，一定要走到最后一步。";
+const START = {
+  电量: { name: "电量不足型", why: "不是不想开始，是真的累了。这时候硬逼自己，只会更难开始。",
+    first: ["先休息：睡够、动一动，再谈学习", "把今天的目标降到最小，比如只看一页、只做一道题"],
+    extra: ["学习前散步或运动 10–20 分钟，可能让脑子更清醒"] },
+  怕: { name: "怕做不好型", why: "难开始，是因为一开始就担心做不好。越想做好，越不敢动。",
+    first: ["把第一步缩到“不可能失败”的大小，比如只写题号、只读第一段", "告诉自己“先做 5 分钟，不行就停”"],
+    extra: ["拖了也别骂自己。原谅这一次，再写一句“下次我先改哪一步”"] },
+  没劲: { name: "嫌它没劲型", why: "难开始，是因为这件事让你觉得无聊、没意思，一想到就烦。",
+    first: ["换个角度看它：把这次学习当成闯关，或者想想它和你在乎的事有什么关系", "把做完之后的样子想具体，比如“做完这页，就能安心去玩”"],
+    extra: [] },
+  没动: { name: "想学但没动型", why: "你知道该学，也不排斥，就是迟迟不动手。缺的是一个“开始的信号”。",
+    first: ["提前写好“如果……就……”：比如“如果吃完晚饭，我就先打开数学错题本”", "固定一个学习的时间和地方，让它自己变成开始的信号"],
+    extra: ["开始前花两分钟想：做完的好处是什么？最可能拦住我的是什么？遇到它我就怎么做？"] },
+};
+const EASY_START = "轻松启动：先挑两三件五分钟就能做完的小事，比如整理错题、把公式抄一遍，让自己进入“正在做”的状态。可以配一样自己喜欢的东西，比如一杯爱喝的饮料、一份纯音乐歌单，但只在学习时才享受。顺利做完几件后，趁着这股劲接上难一点的题；最难、最需要记和想的部分放到最后，关掉声音安静地做。\n为什么有用：连着完成几件容易的事，会带出继续做下去的劲头；喜欢的东西只跟学习绑在一起，开始会变得没那么难。";
+const START_COMMON = ["学习时关掉手机通知，或者把手机放远一点，让它拿起来麻烦一些", "做难题、背书、读长文章时，别听带歌词的歌，纯音乐可以"];
+function startKit(r) {
+  let k;
+  if (r.brake === "电量告急") k = "电量";
+  else if (r.honor === "守门" || r.brake === "学不动") k = "怕";
+  else if (r.brake === "看不到用" || ["怠速", "雾中", "寻路"].includes(r.main)) k = "没劲";
+  else k = "没动";
+  return START[k];
+}
+
+// 9. 学习启动方式库：每条都有具体做法和依据（依据见《学习启动困难的应对方法》报告）
+const WAYS = {
+  轻松启动: { how: "先挑两三件五分钟就能做完的小事，比如整理错题、把公式抄一遍，让自己进入“正在做”的状态。可以配一样喜欢的东西，比如一杯爱喝的饮料、一份纯音乐歌单，但只在学习时才享受。顺利做完几件后，趁着这股劲接上难一点的题；最难、最需要记和想的部分放到最后，关掉声音安静地做。", why: "连着完成几件容易的事，会带出继续做下去的劲头；喜欢的东西只跟学习绑在一起，开始会变得没那么难。" },
+  先做一小步: { how: "别想着“今天要学完一章”，只想第一个动作，而且要小到不可能做不到：只写下题号、只读第一段、只把书翻到今天那一页。做完这一下，今天就算开始了，后面做多少都是多出来的。", why: "第一步越小，越没什么好怕的。人一旦动起来，接着做下去要容易得多。" },
+  先做5分钟: { how: "定一个 5 分钟的闹钟，跟自己说“响了就可以停”。闹钟响了，问自己一句“还想再做 5 分钟吗”。想停就停，不算失败；想继续就再定 5 分钟。", why: "最难的往往只是开头那一下。事情做了一半，人自然会更想把它做完。" },
+  番茄钟: { how: "学 25 分钟，停 5 分钟，四轮之后歇 15–20 分钟。休息时离开书桌，喝水、走动、看看窗外，别刷手机。觉得 25 分钟太长，就从 15 分钟起步，顺了再加。", why: "有研究发现，按固定节奏休息的学生疲劳感更低、心情更好，学的量也不比一口气硬撑少。" },
+  手机隔离: { how: "开始前把手机调成勿扰或专注模式，放进书包或另一个房间，要站起来走几步才拿得到。需要查资料就用电脑，只开要用的那个页面。", why: "每看一次消息都会打断思路，回来还得重新进入状态。拿起来麻烦一点，打断就少一点。" },
+  提前定好开始时间: { how: "写一张小纸条贴在桌上：“如果＿＿，我就＿＿”。比如“如果吃完晚饭，我就先打开数学错题本”。什么时候、在哪、第一个动作是什么，都写清楚。", why: "这是研究里效果比较稳定的方法之一：提前替自己做好决定，到时候就不用再跟自己商量。" },
+  开始前想四个问题: { how: "开始前花两分钟，按顺序想四件事：今天想完成什么？做完最好的结果是什么？最可能拦住我的是什么？遇到它我就怎么做？最后一句写下来，放在眼前。", why: "只想好结果容易松劲；提前想好障碍和对策，真遇上了更容易接着做。这个方法叫 WOOP，有不少研究支持。" },
+  换个角度: { how: "开始前给这次学习换个说法：把一套题当成闯关，每对一题算过一关；或者在本子上写一句“学会这个，对我在乎的＿＿有什么用”。", why: "有研究发现，换个角度看任务，会让人没那么讨厌它，拖延也跟着变少。" },
+  先充电: { how: "先把累解决掉：睡够、喝点水、出门走 10 分钟。回来只定一个最小目标，比如只看一页、只做一道题，做完就可以停。", why: "累的时候硬逼自己，只会越来越怕开始。先恢复一点精力，开始会容易得多。" },
+  做砸了也没关系: { how: "开始前对自己说一句：“这次做砸了，只说明这道题我还不会，不说明我不行。”再把今天的要求从“做好”改成“做完”，比如“错几道都行，先把这一页做完”。还是紧张的话，花两分钟写下一件跟成绩无关、但你很在乎的事，比如对朋友讲义气、会画画，写完再开始。", why: "研究发现，越把一次考试、一道题跟“我行不行”绑在一起，人越容易拖着不开始，好给自己留个台阶。把这一次跟“我是谁”分开，开始就没那么吓人。考前写写自己在乎的事，在一些大型实验里能让压力大的学生成绩好一点，不过效果很小。" },
+  先说出心情: { how: "不想开始时，先花一分钟写一句：“我现在觉得＿＿（烦、怕、慌），因为担心＿＿。”写完对自己说：“有这种感觉很正常，我带着它先做 5 分钟。”不用等心情变好再开始。", why: "很多时候拖着不做，不是懒，是想躲开开始时那股难受。研究发现，越难处理这种情绪的人越容易拖。先把心情说出来、允许它在，开始就没那么费劲。" },
+  安静小角落: { how: "给自己布置一个刺激少的学习角：戴耳塞或降噪耳机，桌上只放这次要用的一本书，灯光别太刺眼，背对人来人往的地方。一次只做一件事，别同时开好几个页面。", why: "有的人对声音、光线、别人的情绪特别敏感，环境一吵就累，还没开始就没电了。研究也发现，这样的人从好环境里得到的帮助更多，把环境调好，回报也更大。" },
+  原谅自己: { how: "拖了也别骂自己。对自己说一句“这次拖了，没关系”，再写一句“下次我先改哪一步”，然后从最小的一步重新开始。", why: "有研究发现，能原谅自己上一次拖延的人，下一次拖得更少；骂自己只会让人更想躲。" },
+  自习直播: { how: "打开一个 Study With Me 自习直播或视频，选有倒计时、没有剧情、不用盯着画面的那种，跟着它的节奏开始和休息。也可以和朋友开着视频，各学各的。", why: "身边有人在学，开始会容易一点。不过这方面的研究还不多，觉得有用就用，觉得分心就关掉。" },
+  学习搭子: { how: "找一个同学约固定时间一起学，线上线下都行。开始前各说一句“今天要做完什么”，结束时互相说一句做到了没有。", why: "说出口的目标更难赖掉；有人在等你，开始就不全靠自己硬撑。" },
+  讲给别人听: { how: "学完一节，用一分钟讲给同学或家人听，或者对着手机录一段。讲不顺的地方，就是还要回去看的地方。", why: "讲出来得自己组织语言，会逼你把没懂的地方找出来，比只看一遍记得牢。" },
+  限时挑战: { how: "给一组题定个时间，和同学比谁先做完、谁错得少；没人比，就和上次的自己比，把用时和正确率记在本子上。", why: "看得见的对手和数字，能让你很快进入状态。比的是速度和正确率，不用比谁更累。" },
+  借一个方法: { how: "找一个比你强一点的同学，问他一个具体做法，比如错题怎么整理、早上先学什么。照着用两周，再决定留不留。", why: "跟比自己强一点的人学，比盯着大神更容易学得来；一次只借一个方法，不会打乱自己的节奏。" },
+  偷偷做套题: { how: "自己计时做一套模拟题，不给任何人看，做完自己批改。每道错题只写一句具体原因，比如“公式记反了”“题目没看完”。", why: "没人看的练习里出错不丢脸。先在这里把失误犯完，正式考试会更稳。" },
+  家人约定: { how: "和家人约一个过程目标，比如“这周每天背 20 个单词”，不约分数。做到了就一起吃顿好的或看场电影。", why: "过程是你能控制的，分数不全是。约过程，家人的期待就变成了一起庆祝的事。" },
+  自己定计划: { how: "每周日花 10 分钟，自己定下周至少一项学习计划，做一张打勾表贴在桌上，做完一项勾一项，只和上周的自己比。", why: "自己定的计划更像是自己的事，做起来更不容易拖。" },
+  固定时间地点: { how: "每天同一个时间、同一个地方开始学，比如晚饭后 7 点、书桌前。桌上只放这次要用的东西，别的都收起来。", why: "同样的时间和地方重复几次，坐下来本身就会变成开始的信号，不用每次都靠意志力。" },
+  带着问题学: { how: "开始前写下一个你真的好奇的问题，比如“这个公式是怎么推出来的”“这段历史为什么会这样”，带着问题去书里找答案。", why: "有了想知道的事，学习就从完成任务变成找答案，开始会自然很多。" },
+  看见进步: { how: "准备一页“这周做对了什么”，每次学完写一条，比如“三道错题重做全对”。下次不想开始时，先翻这一页。", why: "觉得白努力的时候，最缺的是看得见的进步。记下来，下次开始就有了理由。" },
+  难题静音: { how: "做难题、背书、读长文章时，别听带歌词的歌。想要点声音，就放纯音乐或白噪音，音量调低。", why: "歌词会和你要记的文字抢注意力，研究发现它会降低记忆和阅读的效果。" },
+};
+const WAY_KIT = { 电量: ["先充电", "先做一小步"], 怕: ["先做一小步", "做砸了也没关系"], 没劲: ["换个角度", "先做5分钟"], 没动: ["提前定好开始时间", "固定时间地点"] };
+const WAY_H = { 对标: "限时挑战", 高光: "讲给别人听", 追赶: "借一个方法", 荣誉: "家人约定", 守门: "偷偷做套题", 独行: "自己定计划" };
+const WAY_B = { 看不到用: "换个角度", 学不动: "借一个方法", 电量告急: "番茄钟", 方向盘: "自己定计划", 无: "开始前想四个问题" };
+const WAY_M = { 自燃: "带着问题学", 双涡轮: "番茄钟", 外挂: "固定时间地点", 怠速: "自习直播", 雾中: "学习搭子", 寻路: "开始前想四个问题" };
+function pickWays(r) {
+  const kitKey = Object.keys(START).find((k) => START[k] === startKit(r));
+  const order = ["轻松启动", ...WAY_KIT[kitKey], WAY_H[r.honor], WAY_B[r.brake], "手机隔离", WAY_M[r.main]];
+  const main = [...new Set(order.filter(Boolean))].slice(0, 6);
+  const more = Object.keys(WAYS).filter((k) => !main.includes(k));
+  const pack = (k) => ({ name: k, ...WAYS[k] });
+  return { main: main.map(pack), more: more.map(pack) };
+}
+
+// 10. 连贯解读：先看你选了什么，再推你在意什么、底牌是什么、卡在哪、几股劲怎么拧在一起，最后接到方法
+const NARR = {
+  seenM: {
+    自燃: "推着你学的，主要是你自己。",
+    双涡轮: "推你学的有两股力：一股是你自己想学，一股是外面的要求。",
+    外挂: "推着你学的，主要是外面的力。",
+    怠速: "你的学习动力哪一头都不算强烈。",
+  },
+  seenH: {
+    对标: "同时你很在意名次。",
+    高光: "同时，有人看着的时候你明显更来劲。",
+    追赶: "同时你很不服输。",
+    荣誉: "同时你很在乎家里人怎么看。",
+    守门: "同时你很怕考砸了丢脸。",
+    独行: "排名这件事对你影响不大。",
+  },
+  pair: {
+    自燃: {
+      对标: "你是那种喜欢学、也想赢的人。兴趣让你愿意钻，名次给你一个看得见的标尺，两样加在一起，你的劲又足又稳。",
+      高光: "你学东西是因为真的喜欢，被人看见会让这份喜欢更有劲。你在意的不是虚名，是自己弄懂的东西有人懂、有人欣赏。",
+      追赶: "你喜欢学，也不愿意输给身边的人。别人比你强，对你来说不是打击，是一个新目标。",
+      荣誉: "学习对你来说既是自己的事，也是一份对家里人的心意。你想学好，一半为了自己，一半是想让在乎的人放心。",
+      守门: "你是真心喜欢学，只是对“考砸”特别在意。你在乎自己在别人眼里靠不靠谱，这份在乎让你很少掉链子。",
+      独行: "你学习基本只跟自己有关：想弄懂就去弄懂，别人考多少不太影响你。你在意的是自己有没有进步。",
+    },
+    双涡轮: {
+      对标: "你在意的是“做到最好”：自己想学好，外面也要求你学好，排名又摆在那里。你对自己要求很高，也真的愿意为此使劲。",
+      高光: "你既想学好，也希望被人看见你学好。被认可对你很重要，它让你觉得这些努力没有白费。",
+      追赶: "你在意的是不落下：自己有目标，外面有要求，身边还有想追上的人。你不服输，这股劲让你一直往前走。",
+      荣誉: "你在意的是不辜负：不辜负自己，也不辜负家里人。你把很多期待扛在身上，而且大多扛住了。",
+      守门: "你在意的是稳住：自己有要求，外面有期待，你最怕在关键时候失手，所以你准备得比谁都充分。",
+      独行: "你的劲来自自己和外面的要求，跟别人比倒没那么在意。你在意的是把该做的事做好、做完。",
+    },
+    外挂: {
+      对标: "你在意的其实是同一件事：别掉队。家里的眼神和排名表，都在告诉你“你现在在哪个位置”。你对这个位置很敏感，也愿意为它使劲，这正是你能一直扛下来的原因。",
+      高光: "你在意的是别人怎么看你。有人检查、有人关注的时候你最能发挥，说明你很在乎别人的反馈，这份在乎可以变成很好的动力。",
+      追赶: "你在意的是不被比下去。外面的要求推着你走，身边比你强的人又让你不服气，你是那种被激一下就能动起来的人。",
+      荣誉: "你在意的是家里人。你学习很大一部分是为了让他们满意、让他们放心，这份心意很珍贵。",
+      守门: "你在意的是别出错。外面有要求，你又怕考砸了丢脸，所以你很少放任自己，该做的都会做。",
+      独行: "你学习主要是因为“得学”，排名和别人的看法对你影响不大。你在意的是把任务交差，这份稳定其实很难得。",
+    },
+    怠速: {
+      对标: "学习本身还没让你特别上头，但名次能让你动起来。你在意的是“别比别人差”，这是你现在最好用的开关。",
+      高光: "学习本身还没让你特别上头，但有人看着、有人夸的时候，你会明显更来劲。你在意的是被注意到。",
+      追赶: "平时两股劲都不算强，可一看到身边的人超过你，你就不服气了。你在意的是别被落下太多。",
+      荣誉: "学习本身还没让你特别上头，但你在乎家里人的感受，想让他们放心。这份在乎是你现在最稳的动力。",
+      守门: "平时两股劲都不算强，但你很不想在别人面前丢脸。你在意的是面子，这股劲在关键时刻能把你拉起来。",
+      独行: "你两股劲都在中间，也不太跟别人比。你在意的是按自己的节奏来，只是还没找到一件让你特别想学的事。",
+    },
+  },
+  hStr: {
+    对标: "你的胜负欲也是本钱：有一个清楚的目标，你能很快进入状态。",
+    高光: "你的表现欲也是本钱：讲给别人听、在人前展示，会让你学得更扎实。",
+    追赶: "你的不服输也是本钱：别人走在前面，你会想办法追上去。",
+    荣誉: "你对家人的在乎也是本钱：它让你有责任感，很少轻易放弃。",
+    守门: "你的谨慎也是本钱：你准备得充分，不容易在小地方丢分。",
+    独行: "你不跟别人比，这也是本钱：外面再卷，你也不容易乱了节奏。",
+  },
+  stuck: {
+    看不到用: "问题出在这里：你常常想不通学这些有什么用。",
+    学不动: "问题出在这里：你不是不努力，是努力了不见效，手里的办法快用完了。",
+    电量告急: "问题出在这里：你已经有点累了。",
+    方向盘: "还有一点：学习上的事，很多是家里替你定的。",
+  },
+  hb: {
+    对标: {
+      看不到用: "名次能让你动起来，可如果不知道学的东西有什么用，赢了排名也只是一时痛快，很难撑太久。",
+      学不动: "你一直在追，力气也没少花，可名次就是不动。问题多半不在努力，在方法，只是你暂时还没找到新的办法。",
+      电量告急: "你一直盯着前面的人往前冲，很少停下来歇。劲一直往外使，电量自然就见底了。",
+      方向盘: "名次是你自己在乎的，可学什么、怎么学多半是家里定的。在别人画好的跑道上拼命跑，难免会问：这到底是谁的比赛？",
+    },
+    高光: {
+      看不到用: "被看见能让你来劲，可你心里并不确定学这些有什么用。没人看的时候，这个问题就会冒出来。",
+      学不动: "你希望努力被人看见，可花了力气成绩却没动，没东西可展示，这种落差特别磨人。你需要的是一个能让成绩动起来的新方法。",
+      电量告急: "你在人前总想表现好，这很耗精力。等到没人看的时候，你常常已经没电了。",
+      方向盘: "你在意别人的认可，家里的认可又特别重要，所以学习上的事你常常照着家里的意思来。",
+    },
+    追赶: {
+      看不到用: "你不服输，会去追，可追的东西如果你自己都觉得没用，追上了也不太开心。",
+      学不动: "你不服气，也努力追过，可差距没缩小。不是你天生比不过，是你还在用老办法追。",
+      电量告急: "你一直在追别人，追得很累，又不愿意停下来，怕一停就被甩开。",
+      方向盘: "你想追上别人，可学什么、怎么追，很多是家里替你选的，你的不服气有时候找不到自己的出口。",
+    },
+    荣誉: {
+      看不到用: "你学习很大程度是为了家里人，可你自己并不清楚这些有什么用。只为别人学，那股劲很难撑太久。",
+      学不动: "你想让家里人满意，也真的花了力气，可成绩没变化，你会觉得对不起他们。其实缺的是方法，不是心意。",
+      电量告急: "你把家里的期待扛在身上，一直在撑，撑久了就累了。",
+      方向盘: "你在乎家里人，所以学习上的事大多听他们的。这很懂事，只是你自己的想法，常常没机会真正说出来，或者说了也拗不过。",
+    },
+    守门: {
+      看不到用: "你努力很大一部分是为了别丢脸，可你又说不清学这些有什么用。只为了不出错去学，很难学得开心。",
+      学不动: "你最怕考砸丢脸，偏偏手里的办法又不太管用。这两件事放在一起，你会越来越不敢开始，因为不开始就不算失败。换一个方法，先在没人看的地方试出效果。",
+      电量告急: "你一直绷着，怕出错、怕丢脸，绷得太久，人就被耗空了。",
+      方向盘: "你怕让人失望，家里替你定的事，你更不敢做砸。压力一半来自自己，一半来自家里。",
+    },
+    独行: {
+      看不到用: "你不跟别人比，学不学全看自己觉得值不值。偏偏你又常常觉得学的东西没用，所以很难提起劲。",
+      学不动: "你不靠和别人比来找动力，只看自己有没有进步。可努力了一阵也没进步，这时候就没东西推着你了。问题多半在方法，不在你。",
+      电量告急: "你按自己的节奏来，可最近这个节奏也有点撑不住了，你需要先歇一歇。",
+      方向盘: "你不太在意别人怎么比，可学习上的决定多半是家里做的，你自己的节奏很难真正用上。",
+    },
+  },
+  next: {
+    看不到用: "你最需要的不是逼自己多学，而是给学的东西找一个和自己有关的用处。",
+    学不动: "你最需要的不是更多努力，而是一个新方法，加上一次看得见的“我做到了”。",
+    电量告急: "你最需要的不是更拼，而是先把电充回来，再用很小的目标重新开始。",
+    方向盘: "你最需要的不是更听话，而是在学习上拿回一点点自己做主的空间。",
+    无: "你现在状态不错，接下来要做的，是把这股劲用在够得着的目标上，别让它白白耗掉。",
+  },
+};
+// 从答案里挑一题当例子：dir=1 挑分最高的，dir=-1 挑分最低的
+function evidence(ans, dim, dir) {
+  const its = ITEMS.filter((it) => it.dim === dim && ans[it.id] != null);
+  if (!its.length) return "";
+  const it = its.sort((a, b) => dir * (val(b, ans[b.id]) - val(a, ans[a.id])))[0];
+  const stem = it.t.replace(/[，,]?\s*(你)?——$/, "");
+  return `有一题问“${stem}”，你选了“${it.o[ans[it.id] - 1]}”`;
+}
+function narrative(r, ans) {
+  const s = r.s, M = MAIN[r.main], H = HONOR[r.honor], noB = r.brake === "无";
+  const D = { m: DEEP.main[r.main], h: DEEP.honor[r.honor], b: DEEP.brake[r.brake] };
+  const cut = (t) => String(t).replace(/[。；，\s]+$/, "");
+  const q = () => ""; // 不再引用答题原文
+  const out = [];
+  // 1 你平时的样子
+  const mainQ = r.main === "双涡轮" ? `${q("自主", 1)}${q("受控", 1).replace(/^比如/, "又比如")}`
+    : r.main === "自燃" ? q("自主", 1) : r.main === "外挂" ? q("受控", 1) : q("自主", -1);
+  const hDim = r.honor === "独行" ? "对标" : r.honor;
+  out.push(["你平时的样子", []]);
+  // 2 你心里真正在意的
+  out.push(["你心里真正在意的", [NARR.pair[r.main][r.honor], D.m.psych, ...(r.honor === "独行" ? [] : ["至于你的鸡血，" + D.h.psych])]]);
+  // 3 你手里的底牌
+  out.push(["你手里的底牌", [`先说你的底子：${M.plus.map(cut).join("；")}。${NARR.hStr[r.honor]}`, `也有要留意的地方：${M.minus.map(cut).join("；")}。`]]);
+  // 4 卡住你的地方
+  const calmButStuck = r.main === "怠速" && r.brake === "学不动" ? "看起来你挺佛系、脾气也好，其实不是不在乎，是试过的办法都不太管用，只好先放着。" : "";
+  if (!noB) out.push(["卡住你的地方", [NARR.stuck[r.brake] + calmButStuck + NARR.hb[r.honor][r.brake], D.b.psych]]);
+  else out.push(["目前没有卡住你的地方", [D.b.psych + "这是很好的状态，记得别把它当成理所当然。"]]);
+  return { out, D, next: NARR.next[r.brake] };
+}
+
+
+
+</script>
+<script>
+(function(){
+const ACCESS = "4826";
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let mugSerial = 0;
+function mug(prop, cls, progress){
+  const clipId = "mug-liquid-" + ++mugSerial;
+  const fillY = Math.round((1 - Math.max(0, Math.min(1, progress))) * 58);
+  const props = {
+    book:'<path d="M33 86q17-8 37 3 20-11 37-3v30q-17-6-37 3-20-9-37-3Z" fill="#d6e8d8"/><path d="M70 90v28m-30-22 19 5m21 0 17-5" stroke-width="1.5"/>',
+    pencil:'<path d="m112 98 14-36 7 3-14 36-8 5Z" fill="#e2bb78"/><path d="m126 62 7 3" stroke-width="2"/><path d="M20 66l4-8 4 8m-4-8v14" stroke="#8b4565" stroke-width="2"/>',
+    cap:'<path d="M54 49v8q16 7 32 0v-8" fill="#3f2a20" stroke-width="2"/><path d="M36 45 70 32l34 13-34 13Z" fill="#3f2a20" stroke-width="2"/><path d="M70 45q20 1 27 4v13" stroke="#e2bb78" stroke-width="2"/><path d="M94 61h6l-1 9h-4Z" fill="#e2bb78" stroke="#e2bb78" stroke-width="1.5"/><ellipse cx="55" cy="84" rx="5" ry="3" fill="#f0b9c4" stroke="none"/><ellipse cx="88" cy="84" rx="5" ry="3" fill="#f0b9c4" stroke="none"/><path d="m112 98 14-36 7 3-14 36-8 5Z" fill="#e2bb78"/><path d="m126 62 7 3" stroke-width="2"/>',
+    spark:'<path d="M22 60v12m-6-6h12M118 52v10m-5-5h10" stroke="#8b4565" stroke-width="2.4"/>'
+  };
+  return `<svg class="${cls}" viewBox="0 0 140 150" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#3f2a20" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M42 56v56q0 7 7 7h42q7 0 7-7V56Z" fill="#fffaf2"/><defs><clipPath id="${clipId}"><path d="M44 58h52v53q0 6-6 6H50q-6 0-6-6Z"/></clipPath></defs><g clip-path="url(#${clipId})"><rect class="mug-liquid" x="44" y="58" width="52" height="60" style="transform:translateY(${fillY}px)" fill="#a9cdb2" opacity=".8" stroke="none"/></g><path d="M98 67q19 1 19 18t-19 18"/><path d="M42 73h9m-9 12h5m-5 13h9" stroke-width="1.7"/><circle cx="63" cy="76" r="2.3" fill="#3f2a20" stroke="none"/><circle cx="80" cy="76" r="2.3" fill="#3f2a20" stroke="none"/><path d="M65 88q7 7 13 0" stroke-width="1.8"/><path d="m42 87-10 6m66-6 9 6" stroke-width="2.5"/>${props[prop]||""}<path d="m54 119-5 15m35-15 5 15m-44 1h10m31 0h10"/></svg>`;
+}
+function cheerMug(){
+  return `<svg class="cmug" viewBox="0 0 140 150" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#3f2a20" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 52l-7-4M21 42l-4-7M118 24l3-7M127 33l7-3" stroke="#e2bb78" stroke-width="2.4"/><path d="M42 56v56q0 7 7 7h42q7 0 7-7V56Z" fill="#fffaf2"/><path d="M44 92q13-5 26 0t26 0v19q0 6-6 6H50q-6 0-6-6Z" fill="#a9cdb2" stroke="none"/><path d="M98 70q19 1 19 18t-19 18"/><path d="M42 80h9m-9 12h5m-5 13h9" stroke-width="1.7"/><path d="M41 64h58" stroke="#8b4565" stroke-width="7"/><path d="m100 64 11-7m-11 7 12 2" stroke="#8b4565" stroke-width="3"/><path d="M57 79q4-5 8 0m10 0q4-5 8 0" stroke-width="2.4"/><path d="M62 87q8 10 16 0Z" fill="#8b4565" stroke-width="2"/><ellipse cx="53" cy="86" rx="4.5" ry="2.6" fill="#f0b9c4" stroke="none"/><ellipse cx="87" cy="86" rx="4.5" ry="2.6" fill="#f0b9c4" stroke="none"/><path d="M42 82 27 62"/><circle cx="25" cy="58" r="5" fill="#fffaf2"/><path d="M98 66l14-22"/><circle cx="114" cy="40" r="5" fill="#fffaf2"/><path d="m54 119-5 15m35-15 5 15m-44 1h10m31 0h10"/></svg>`;
+}
+function setMug(p){ document.querySelectorAll("#quizMug .mug-liquid").forEach((el)=> el.style.transform = "translateY(" + Math.round((1-p)*58) + "px)"); }
+
+$("logo").innerHTML = mug("", "", .6);
+$("introMug").innerHTML = mug("cap", "", .5);
+$("quizMug").innerHTML = mug("pencil", "", 0);
+$("loadMug").innerHTML = mug("spark", "", .9);
+$("invMug").innerHTML = mug("", "", .2).replace("<svg ", '<svg width="90" height="96" ');
+
+// 封面数字全部由数据算出
+const N = ORDER.length;
+const MAIN_KEYS = ["自燃","双涡轮","外挂","怠速"];
+const imgOf = (r) => "" + String(MAIN_KEYS.indexOf(r.main)*30 + Object.keys(HONOR).indexOf(r.honor)*5 + Object.keys(BRAKE).indexOf(r.brake) + 1).padStart(3,"0") + ".webp";
+$("pills").innerHTML = [`${N} 道真实场景题`, `约 ${Math.max(1, Math.round(N*10/60))} 分钟`, `${new Set(ITEMS.map((it)=>it.dim)).size} 个维度`].map((t)=>`<span>${t}</span>`).join("");
+
+$("aboutBtn").onclick = () => { $("about").hidden = !$("about").hidden; };
+
+const byId = Object.fromEntries(ITEMS.map((it)=>[it.id,it]));
+let answers = {}, idx = 0, timer = null, last = null;
+
+function show(name){
+  clearTimeout(timer);
+  document.querySelectorAll(".screen").forEach((el)=> el.classList.toggle("active", el.id === "screen-" + name));
+  window.scrollTo(0,0);
+}
+$("accessForm").addEventListener("submit", (e)=>{
+  e.preventDefault();
+  const v = $("code").value.trim();
+  const card = $("accessForm");
+  let msg = "";
+  if (!/^\d{4}$/.test(v)) msg = "请输入完整的四位兑换码。";
+  else if (v !== ACCESS) msg = "兑换码不对，请再看一眼。";
+  $("codeErr").textContent = msg;
+  if (msg){ card.classList.remove("shake"); void card.offsetWidth; card.classList.add("shake"); return; }
+  answers = {}; idx = 0; render(); show("quiz");
+});
+
+function render(){
+  const it = byId[ORDER[idx]];
+  const done = Object.keys(answers).length;
+  $("pCount").textContent = `第 ${idx+1} / ${N} 题`;
+  $("pFill").style.width = (done / N * 100) + "%";
+  setMug(done / N);
+  $("qNum").textContent = "NO." + String(idx+1).padStart(2,"0");
+  $("qText").textContent = it.t;
+  const cur = answers[it.id];
+  $("opts").innerHTML = it.o.map((s,i)=>`<button type="button" class="option${cur===i+1?" on":""}" data-v="${i+1}"><span class="dot">${"ABCDEF"[i]}</span>${esc(s)}</button>`).join("");
+  $("skipBtn").hidden = !it.skip;
+  $("skipBtn").classList.toggle("on", it.skip && cur === null);
+  $("prevBtn").style.visibility = idx ? "visible" : "hidden";
+  $("nextBtn").disabled = !(it.id in answers);
+  $("nextBtn").textContent = idx === N-1 ? "看结果" : "下一题";
+}
+$("opts").addEventListener("click", (e)=>{
+  const b = e.target.closest(".option"); if (!b) return;
+  answer(+b.dataset.v);
+});
+$("skipBtn").onclick = () => answer(null);
+function answer(v){
+  answers[ORDER[idx]] = v;
+  render();
+}
+$("nextBtn").onclick = () => { if (!(ORDER[idx] in answers)) return; if (idx < N-1){ idx++; render(); window.scrollTo(0,0); } else finish(); };
+$("prevBtn").onclick = () => { if (idx){ clearTimeout(timer); idx--; render(); } };
+$("retryBtn").onclick = () => { answers = {}; idx = 0; render(); show("quiz"); };
+
+function finish(){
+  $("loading").hidden = false;
+  setTimeout(()=>{
+    $("loading").hidden = true;
+    const r = score(answers);
+    if (r.invalid){ show("invalid"); return; }
+    last = r; buildResult(r); show("result");
+  }, 1300);
+}
+
+const BLEAD = { 看不到用:"觉得学了没用", 学不动:"努力了不见效，手里的办法快用完了", 电量告急:"太累了，电量不够", 方向盘:"学习上的决定受家长影响很大" };
+const LEAD = { 自燃:"主要来自你自己", 双涡轮:"一半来自你自己，一半来自外面的推力", 外挂:"主要来自外面的推力", 怠速:"哪儿都有一点，但都不太强", 雾中:"暂时还没找到落脚点", 寻路:"还在路上，你正在找属于自己的理由" };
+const WHY_LOST = "另外，你现在可能说不太清自己为什么要学。这不说明你不行，更常见的原因是，学的东西和你在乎的事之间，一直没人帮你接上线。先弄清“为什么”，比硬逼自己更要紧，理由一旦找到，劲会来得很快。";
+const WHY_SEEK = "另外，你还在想“为什么要学”这个问题，而且没躺平，一直在找答案。这比“已经不找了”好得多，你只是还没找到属于自己的那个理由。";
+const cut = (t) => String(t).replace(/[。；，\s]+$/,"");
+const dot = (t) => cut(t) + "。";
+const clauses = (t) => t.split("，").map((x,i,a)=>`<span class="nb">${x}${i<a.length-1?"，":""}</span>`).join("");
+const ul = (arr) => `<ul>${arr.map((x)=>`<li>${x}</li>`).join("")}</ul>`;
+function buildResult(r){
+  const s = r.s, M = MAIN[r.main], H = HONOR[r.honor], B = BRAKE[r.brake];
+  const soft = r.flag, noB = r.brake === "无";
+  const FN = fullName(r, soft), PN = plainName(r);
+  const mainRoast = M.roast;
+  const brakeRoast = B.roast;
+  const html = [];
+
+  const sec = (id, icon, title, take, body) => `<section class="card sec" id="${id}"><header class="sec-h"><span class="ic"><i data-lucide="${icon}"></i></span><h3>${title}</h3></header>${take ? `<p class="take">${take}</p>` : ""}${body}</section>`;
+  const acc = (icon, title, body, open) => `<details class="acc"${open ? " open" : ""}><summary><i data-lucide="${icon}"></i><span>${title}</span><i data-lucide="chevron-down" class="chev"></i></summary><div class="acc-b">${body}</div></details>`;
+  const ps = (arr) => arr.map((x)=>`<p>${x}</p>`).join("");
+
+  // 学习动力：只比较动力本身（自身动力、外界压力、最强的那股鸡血），阻力和“不知道为啥学”不算动力
+  const hDim = r.honor !== "独行" ? r.honor : ["对标","高光","追赶","荣誉","守门"].sort((x,y)=>s[y]-s[x])[0];
+  const rows = [
+    { k:"自主", label:"自身动力", sc:s["自主"] },
+    { k:"受控", label:"外界压力", sc:s["受控"] },
+    { k:hDim, label:DIM_LABEL[hDim], sc:s[hDim] },
+  ];
+  const top = [...rows].sort((x,y)=>(r.adj ? r.adj[y.k]-r.adj[x.k] : y.sc-x.sc))[0]; // 按“比一般人高多少”定首要动力，显示原始分
+  const MOTV = top.k === "自主" ? "自己的劲最耐烧，没人盯着也能慢慢往前走。"
+    : top.k === "受控" ? "外界压力起步快，但一松就容易掉速。慢慢把它换成自己的理由，会走得更久。"
+    : `这股劲是你现在最大的燃料。${HONOR[top.k].use}`;
+  html.push(`<div class="card hero motive">
+    <div class="eyebrow">你的学习动力</div>
+    <div class="mlabel">你学习的首要动力是</div><div class="mtitle">${top.label}</div>
+    <div class="drv">${rows.map((x)=>`<div class="dv${x===top?" top":""}"><span>${x.label}</span><span class="t"><i style="width:${(x.sc-1)/4*100}%"></i></span><b>${x.sc.toFixed(1)}</b></div>`).join("")}</div>
+    <p class="small">${MOTV}</p>
+  </div>`);
+
+  // 数据
+  const groups = [["你靠什么在学",["自主","受控"]],["什么给你打鸡血",["对标","高光","追赶","荣誉","守门"]],["你的方向",["有方向","在找"]]];
+  html.push(sec("s-data","activity","动力仪表盘", "", `<p class="small" style="margin:10px 0 4px">满分 5 分，深色表示明显（3.5 分以上）。</p><div class="dash">` +
+    [[groups[0],groups[2]],[groups[1]]].map((col)=>`<div class="dash-col">` + col.map(([g,ds])=>`<div class="dash-group"><b>${g}</b>${ds.map((d)=>`<div class="bar${s[d]>=3.5?" hi":""}"><span>${DIM_LABEL[d]}</span><span class="t"><i style="width:${(s[d]-1)/4*100}%"></i></span><span>${s[d].toFixed(1)}</span></div>`).join("")}</div>`).join("") + `</div>`).join("") + `</div>`));
+
+  html.push(`<div class="card hero persona">
+    <div class="eyebrow">所以，你的学习人设是</div>
+    <img class="pimg" src="${imgOf(r)}" alt="${esc(FN.core)}的马克杯插画" width="512" height="512">
+    <div class="tname">${FN.core}</div><div class="pre">${clauses(FN.line)}</div>
+    <div class="roastbox">${mainRoast ? `<p class="r1">${mainRoast}</p>` : ""}<p>${H.roast}</p>${!noB && brakeRoast ? `<p>${brakeRoast}</p>` : ""}</div>
+  </div>`);
+
+  html.push(`<nav class="jump" aria-label="结果目录">${[["s-judge","判断"],["s-read","解读"],["s-way","方法"],["s-share","分享"]].map(([id,t])=>`<button type="button" data-go="${id}">${t}</button>`).join("")}</nav>`);
+
+  // 判断
+  const aw = aceAndWeak(s), tens = pickTensions(s);
+  const judgeTake = aw.ace.dim && aw.weak.dim ? `你的王牌是「${DIM_LABEL[aw.ace.dim]}」。` : "";
+  html.push(sec("s-judge","scale","关于你的几句判断", judgeTake, `
+    <div class="pair">
+      <div class="row good"><i data-lucide="trophy"></i><div><b>王牌</b><p>${aw.ace.text}</p></div></div>
+      <div class="row warn"><i data-lucide="trending-up"></i><div><b>还能更强的地方</b><p>${aw.weak.text}</p></div></div>
+    </div>
+`));
+
+  // 解读
+  const Dm = DEEP.main[r.main], Dh = DEEP.honor[r.honor], Db = DEEP.brake[r.brake];
+  const lead = `你学习的动力${LEAD[r.main]}。最能给你打鸡血的，是“${H.tag}”${noB ? "；目前没有明显拖后腿的地方。" : `；现在最需要照顾一下的，是${BLEAD[r.brake]}，这一点后面有具体办法。`}`;
+  html.push(sec("s-read","book-open","完整解读", lead, `
+    <div class="cheer-row">${cheerMug()}<p class="cheer">${M.cheer}</p></div>
+    ${(() => {
+      const nv = narrative(r, answers);
+      const sec2 = nv.out.map(([h, ps0]) => [h, ps0]);
+      // 性格放进“平时的样子”，“不知道为啥学”放进“在意的”
+      sec2[0][1].push(`${Dm.trait}${r.honor === "独行" ? "说到和别人比" : "说到打鸡血"}，你${cut(Dh.trait)}。${noB ? "" : `从卡住你的那一项，也能看出你的一面：你${Db.trait}`}`);
+      if (s["有方向"] >= 3.5) sec2[0][1].push("你对以后想去哪已经有了比较清楚的方向，这会让现在学的东西更有奔头，也是你很大的一个优势。");
+      else if (s["有方向"] <= 2.5) sec2[0][1].push("以后想去哪，你暂时还没想清楚，这在这个年纪很正常，可以边学边找。");
+      if (s["无动机"] >= 3.5) sec2[1][1].splice(1, 0, s["在找"] >= 3.5 ? WHY_SEEK : WHY_LOST);
+      const tn = tens.filter((t)=> t.a !== r.brake && t.b !== r.brake);
+      if (tn.length) sec2.push(["这几股劲怎么拧在一起", tn.map((t)=>`<b>${t.title}。</b>${t.text}`)]);
+      else if (noB) sec2.push(["这几股劲怎么拧在一起", ["你的几股劲方向一致，没有明显互相拉扯，所以不太内耗。只是一旦这股劲变弱，也没有别的劲能顶上，所以值得多培养一个动力来源。"]]);
+      sec2.push(["为什么会这样", [`你的学习动力会是现在这个样子，可能跟这几件事有关：${Dm.factors.map(cut).join("；")}。${r.honor === "独行" ? "" : `你的${DIM_LABEL[r.honor]}，多半来自这些经历：${Dh.factors.map(cut).join("；")}。`}${noB ? "" : `至于卡住你的那一项，常见的原因是：${Db.factors.map(cut).join("；")}。`}`, noB ? "这些经历塑造了你现在的状态，值得好好保护，别让它被太重的任务和比较慢慢磨掉。" : "这些都不是你的错，大多是环境和经历一点点塑造出来的，所以也能一点点改。"]]);
+      sec2.push(["大脑里在发生什么", [Dm.brain, Dh.brain, ...(noB ? [] : [Db.brain])]]);
+      const wb = pickWays(r).main.find((w)=> w.name === WAY_B[r.brake]);
+      sec2.push(["所以，接下来", [`${nv.next}${wb ? `下面“适合你的学习启动方式”里的“${wb.name}”，就是照着这一点挑的。` : ""}`, `具体可以这样做。先说你的学习动力：${Dm.cope.map(dot).join("")}`, `再说你的${DIM_LABEL[r.honor === "独行" ? "对标" : r.honor]}：${Dh.cope.map(dot).join("")}`.replace(/^再说你的胜负欲：(?=.*)/, r.honor === "独行" ? "再说比较这件事：" : "再说你的胜负欲："), ...(noB ? [] : [`最后是卡住你的那一项：${Db.cope.map(dot).join("")}`])]]);
+      return sec2.map(([h, ps0]) => `<h4 class="nh">${h}</h4>${ps(ps0)}`).join("");
+    })()}`));
+
+  // 方法
+  const wy = pickWays(r), bd = BUDDY[r.main];
+  const done = (()=>{ try { return JSON.parse(localStorage.getItem("ways-done")||"{}"); } catch(e){ return {}; } })();
+  const wayLi = (w,k) => `<li><label><input type="checkbox" id="way-${k}" ${done[w.name]?"checked":""} data-key="${esc(w.name)}"><span class="box-ck"><i data-lucide="check"></i></span><span class="tx"><b>${w.name}</b>${w.how}<span class="para">${w.why}</span></span></label></li>`;
+  html.push(sec("s-way","footprints","适合你的学习启动方式", "学不进去时，从第一条开始。试过的可以勾掉。", `
+    <ul class="todo">${wy.main.map((w,k)=>wayLi(w,k)).join("")}</ul>
+    <div class="buddy"><i data-lucide="users"></i><div><b>适合和你一起学的人</b><p>${bd.who}。${bd.why}</p></div></div>`));
+
+  // 打气
+  html.push(`<section class="card cheer-card"><i data-lucide="sparkles"></i><h3>最后，给你打个气</h3><p class="big">${aw.cheer}</p><p>不用一下子改变什么，从“学习启动方式”里的第一条开始就行。</p></section>`);
+
+  // 分享
+  html.push(sec("s-share","share-2","分享卡", "", `
+    <div class="share-card" id="shareCard"></div>
+    <div class="actions"><button class="btn" id="copyBtn" type="button">复制文案</button><button class="btn alt" id="shotBtn" type="button">生成图片</button><button class="btn line" id="againBtn" type="button">再测一次</button></div>
+    <div class="err" id="shareMsg" style="text-align:center"></div>
+    <img id="shot" alt="分享卡图片，长按保存" hidden>
+    <p class="note" style="text-align:center">在手机上生成图片后长按保存。分享卡不包含原始答案。</p>`));
+
+  html.push(`<p class="note" style="text-align:center">结果描述的是你最近的“倾向”，不是定论，也不是诊断。过一段时间再测，答案可能不一样。</p>`);
+  $("result").innerHTML = html.join("");
+  document.querySelectorAll("#s-read details").forEach((d)=> d.open = true);
+  try { window.lucide && lucide.createIcons(); } catch(e){}
+  document.querySelectorAll(".jump button").forEach((b)=> b.onclick = () => { const el = $(b.dataset.go); if (el) el.scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"start"}); });
+  document.querySelectorAll(".todo input").forEach((c)=> c.onchange = () => { try { const d = JSON.parse(localStorage.getItem("ways-done")||"{}"); d[c.dataset.key] = c.checked; localStorage.setItem("ways-done", JSON.stringify(d)); } catch(e){} });
+
+  $("shareCard").innerHTML = `<div class="brandline">马克杯 · 刻度 · 学习动力篇</div>${cheerMug()}
+    <div class="sroast">我学习的首要动力是</div><div class="sname">${top.label}</div>
+    <div class="sdash">${groups.map(([g,ds])=>`<div class="sg"><b>${g}</b>${ds.map((d)=>`<div class="bar${s[d]>=3.5?" hi":""}"><span>${DIM_LABEL[d]}</span><span class="t"><i style="width:${(s[d]-1)/4*100}%"></i></span><span>${s[d].toFixed(1)}</span></div>`).join("")}</div>`).join("")}</div>
+    <p class="scheer">${aw.cheer}</p>
+    <div class="foot">趣味自测，不是诊断</div>`;
+  $("againBtn").onclick = () => { answers = {}; idx = 0; render(); show("quiz"); };
+  $("copyBtn").onclick = () => {
+    const text = `我在「马克杯 · 刻度」测了学习动力：我学习的首要动力是「${top.label}」。${aw.cheer} 你的学习动力从哪来？`;
+    const done = () => $("shareMsg").textContent = "文案已复制。";
+    const fail = () => { $("shareMsg").textContent = text; };
+    try { navigator.clipboard.writeText(text).then(done, fail); } catch(e){ fail(); }
+  };
+  $("shotBtn").onclick = () => {
+    if (!window.html2canvas){ $("shareMsg").textContent = "图片生成没加载出来，可以直接截图分享卡。"; return; }
+    $("shareMsg").textContent = "正在生成……";
+    html2canvas($("shareCard"), {scale: 2, backgroundColor: "#fcf2e3"}).then((c)=>{
+      $("shot").src = c.toDataURL("image/png"); $("shot").hidden = false;
+      $("shareMsg").textContent = "图片好了，长按或右键保存。";
+    }).catch(()=> $("shareMsg").textContent = "生成失败了，可以直接截图分享卡。");
+  };
+}
+
+// 测试钩子：?demo 用于本地检查
+window.__quiz = { setAnswers:(a)=>{ answers = a; }, build:(r)=>{ buildResult(r); show("result"); }, finish, show, render, get answers(){ return answers; } };
+})();
+</script>
+
+</body>
+</html>
